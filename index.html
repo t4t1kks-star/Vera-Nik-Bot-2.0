@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Симулятор Веры Николаевны</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #0f001a;
+      --accent: #ff2e63;
+      --accent-dark: #c81e45;
+      --text: #f0e6ff;
+      --card: #1a1033;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0f001a, #1a0033);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #root {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 16px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(6px);
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      border-bottom: 1px solid #333;
+    }
+    .score {
+      font-size: 2.8rem;
+      font-weight: 900;
+      margin: 8px 0;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(255,46,99,0.7);
+    }
+    .level {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    .energy-bar {
+      height: 14px;
+      background: #222;
+      border-radius: 7px;
+      margin: 10px 16px;
+      overflow: hidden;
+      border: 1px solid #444;
+    }
+    .energy-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #ff2e63, #ff6b9d);
+      transition: width 0.4s ease-out;
+    }
+    #vera {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-size: 180px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: transform 0.08s;
+    }
+    #vera:active {
+      transform: scale(0.92);
+    }
+    .particle {
+      position: absolute;
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--accent);
+      pointer-events: none;
+      text-shadow: 0 0 10px currentColor;
+      animation: floatUp 1.2s forwards;
+      opacity: 0.9;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) scale(0.6); opacity: 0.9; }
+      30%  { transform: translateY(-40px) scale(1.1); }
+      100% { transform: translateY(-140px) scale(0.4); opacity: 0; }
+    }
+    .bottom-bar {
+      padding: 12px 16px;
+      background: rgba(20,10,40,0.7);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid #333;
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.9rem;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat b {
+      display: block;
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+    @media (min-height: 800px) {
+      #vera { font-size: 240px; }
+    }
+    @media (min-height: 1000px) {
+      #vera { font-size: 300px; }
+    }
+  </style>
+</head>
+<body>
+<div id="root">
+  <header>
+    <div class="level">Уровень <span id="lvl">1</span> • Вера Николаевна</div>
+    <div class="score" id="coins">0</div>
+    <div class="energy-bar">
+      <div class="energy-fill" id="energyFill" style="width:100%"></div>
+    </div>
+  </header>
+
+  <div id="vera">🧮</div>
+
+  <div class="bottom-bar">
+    <div class="stat">Энергия<br><b id="energyText">1000/1000</b></div>
+    <div class="stat">в сек<br><b id="passive">0.0</b></div>
+    <div class="stat">Тапы<br><b id="taps">0</b></div>
+  </div>
+</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+
+let state = {
+  coins: 0,
+  level: 1,
+  energy: 1000,
+  maxEnergy: 1000,
+  passivePerSec: 0,
+  tapsCount: 0,
+  lastEnergyTime: Date.now(),
+  tapValue: 1,
+  energyPerTap: 1,
+  upgradesBought: {}
+};
+
+// Заглушка синхронизации (в продакшене — отправлять на сервер через tg.sendData или fetch)
+function saveState() {
+  // Здесь можно отправить данные на бэкенд
+  // tg.sendData(JSON.stringify(state));
+  localStorage.setItem("vera_state", JSON.stringify(state));
+}
+
+function loadState() {
+  const saved = localStorage.getItem("vera_state");
+  if (saved) {
+    Object.assign(state, JSON.parse(saved));
+  }
+  render();
+}
+
+function render() {
+  document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
+  document.getElementById("lvl").textContent = state.level;
+  document.getElementById("energyText").textContent = `${Math.floor(state.energy)}/${state.maxEnergy}`;
+  document.getElementById("passive").textContent = state.passivePerSec.toFixed(1);
+  document.getElementById("taps").textContent = state.tapsCount.toLocaleString();
+
+  const pct = (state.energy / state.maxEnergy) * 100;
+  document.getElementById("energyFill").style.width = pct + "%";
+}
+
+let lastTapTime = 0;
+
+function createParticle(x, y) {
+  const p = document.createElement("div");
+  p.className = "particle";
+  p.textContent = "+" + state.tapValue;
+  p.style.left = x + "px";
+  p.style.top = y + "px";
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 1400);
+}
+
+function onTap(e) {
+  const now = Date.now();
+  if (now - lastTapTime < 40) return; // защита от слишком быстрого спама
+  lastTapTime = now;
+
+  if (state.energy < state.energyPerTap) return;
+
+  state.energy -= state.energyPerTap;
+  state.coins += state.tapValue;
+  state.tapsCount++;
+
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+  const y = e.touches ? e.touches[0].clientY : e.clientY;
+  createParticle(x, y);
+
+  render();
+  saveState();
+}
+
+// Пассивный доход + восстановление энергии
+function gameLoop() {
+  const now = Date.now();
+  const dt = (now - state.lastEnergyTime) / 1000;
+  state.lastEnergyTime = now;
+
+  // пассив
+  state.coins += state.passivePerSec * dt;
+
+  // восстановление энергии
+  const regen = 60; // +60 энергии в минуту → 1 в секунду
+  state.energy = Math.min(state.maxEnergy, state.energy + regen * dt);
+
+  render();
+}
+
+document.getElementById("vera").addEventListener("pointerdown", onTap);
+document.getElementById("vera").addEventListener("touchstart", onTap);
+
+loadState();
+setInterval(gameLoop, 800);
+
+// При старте можно запросить данные с сервера (опционально)
+// fetch('/api/load?user=' + tg.initDataUnsafe.user?.id).then(...)
+
+tg.MainButton.setText("Купить улучшения").show();
+tg.MainButton.onClick(() => {
+  alert("Магазин пока в разработке!\n\nСкоро появятся:\n• Доска ➜ +1 за тап\n• Кофе Веры ➜ +энергия\n• Журнал успеваемости ➜ пассив\n• Двойной контрольный ➜ ×2 множитель");
+});
+
+</script>
+</body>
+</html>
