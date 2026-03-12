@@ -3,245 +3,375 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Симулятор Веры Николаевны</title>
+  <title>Вера Николаевна — Школьный кликер</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    :root {
-      --bg: #0f001a;
-      --accent: #ff2e63;
-      --accent-dark: #c81e45;
-      --text: #f0e6ff;
-      --card: #1a1033;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #0f001a, #1a0033);
-      color: var(--text);
-      height: 100vh;
-      overflow: hidden;
-      touch-action: manipulation;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #2b2118; /* цвет старой доски */
+      height: 100vh;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
     #root {
       height: 100%;
       display: flex;
       flex-direction: column;
+      background: radial-gradient(circle at 20% 30%, #3e2e1f, #1f1812);
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+      position: relative;
     }
-    header {
-      padding: 12px 16px;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(6px);
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.1rem;
-      border-bottom: 1px solid #333;
+
+    /* Школьная тема: текстура мела, доска, лента */
+    .chalkboard-header {
+      background: #0c3b2e; /* зелёный доски */
+      padding: 20px 16px 12px;
+      border-bottom: 4px solid #a57c4b;
+      box-shadow: 0 4px 0 #5e3a1c;
+      position: relative;
+      font-family: 'Courier New', monospace;
+      text-transform: uppercase;
+      letter-spacing: 2px;
     }
-    .score {
-      font-size: 2.8rem;
+
+    .chalkboard-header::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(45deg, rgba(255,255,240,0.05) 0px, rgba(255,255,240,0.05) 4px, transparent 4px, transparent 8px);
+      pointer-events: none;
+    }
+
+    .teacher-name {
+      font-size: 1rem;
+      color: #f9e0a0;
+      text-shadow: 2px 2px 0 #422b1b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .teacher-name span {
+      background: #9e6d3b;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      color: #fef7d6;
+      border: 1px solid #eec27e;
+    }
+
+    .score-board {
+      background: #1e4d3b;
+      border: 4px solid #ba9f6c;
+      border-radius: 30px;
+      padding: 12px 24px;
+      margin: 12px 0 8px;
+      display: inline-block;
+      box-shadow: inset 0 -3px 0 #3c2b14, 0 6px 0 #2f4d3a;
+    }
+
+    .score-number {
+      font-size: 3.2rem;
       font-weight: 900;
-      margin: 8px 0;
-      color: var(--accent);
-      text-shadow: 0 0 20px rgba(255,46,99,0.7);
+      color: #fefae0;
+      text-shadow: 3px 3px 0 #5a3e1f, 5px 5px 0 #2b4b2b;
+      line-height: 1;
+      font-family: 'Courier New', monospace;
     }
-    .level {
-      font-size: 1.1rem;
-      opacity: 0.9;
+
+    .energy-block {
+      padding: 0 20px 10px;
     }
-    .energy-bar {
-      height: 14px;
-      background: #222;
-      border-radius: 7px;
-      margin: 10px 16px;
+
+    .energy-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #edd5a8;
+      text-shadow: 1px 1px 0 #352a1c;
+      margin-bottom: 4px;
+    }
+
+    .energy-track {
+      height: 20px;
+      background: #3a281c;
+      border-radius: 30px;
+      border: 2px solid #785f34;
       overflow: hidden;
-      border: 1px solid #444;
+      box-shadow: inset 0 2px 5px #0f0904;
     }
+
     .energy-fill {
       height: 100%;
       width: 100%;
-      background: linear-gradient(90deg, #ff2e63, #ff6b9d);
-      transition: width 0.4s ease-out;
+      background: linear-gradient(90deg, #f6b83d, #ffdd87);
+      border-radius: 30px;
+      box-shadow: 0 0 15px #ffb347;
+      transition: width 0.3s ease;
     }
-    #vera {
+
+    /* Учительница — центр */
+    .teacher-click-area {
       flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       position: relative;
-      font-size: 180px;
       cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: transform 0.08s;
     }
-    #vera:active {
-      transform: scale(0.92);
+
+    .teacher-emoji {
+      font-size: 240px;
+      line-height: 1;
+      filter: drop-shadow(0 20px 15px #00000070);
+      transform: scale(1);
+      transition: transform 0.1s cubic-bezier(0.2, 1.6, 0.5, 1);
+      text-shadow: 0 0 0 transparent;
     }
-    .particle {
+
+    .teacher-emoji:active {
+      transform: scale(0.85);
+    }
+
+    .chalk-particle {
       position: absolute;
-      font-size: 28px;
+      font-size: 32px;
       font-weight: bold;
-      color: var(--accent);
+      color: #f9eeb2;
+      text-shadow: 0 0 10px #ffd966, 1px 1px 0 #7a4d1a;
       pointer-events: none;
-      text-shadow: 0 0 10px currentColor;
-      animation: floatUp 1.2s forwards;
-      opacity: 0.9;
+      z-index: 100;
+      animation: chalkFloat 1.2s forwards;
     }
-    @keyframes floatUp {
-      0%   { transform: translateY(0) scale(0.6); opacity: 0.9; }
-      30%  { transform: translateY(-40px) scale(1.1); }
-      100% { transform: translateY(-140px) scale(0.4); opacity: 0; }
+
+    @keyframes chalkFloat {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(-150px) rotate(20deg); }
     }
-    .bottom-bar {
-      padding: 12px 16px;
-      background: rgba(20,10,40,0.7);
-      backdrop-filter: blur(8px);
-      border-top: 1px solid #333;
+
+    .bottom-stats {
+      background: #a28357;
+      border-top: 4px solid #eccc8b;
+      padding: 12px 20px 18px;
       display: flex;
       justify-content: space-around;
-      font-size: 0.9rem;
+      box-shadow: 0 -6px 0 #594d32;
+      color: #2b1f0f;
+      font-weight: bold;
+      font-size: 1rem;
+      text-transform: uppercase;
     }
-    .stat {
+
+    .stat-item {
       text-align: center;
+      background: #fcf0cf;
+      padding: 8px 16px;
+      border-radius: 40px;
+      border: 2px solid #c9a454;
+      min-width: 100px;
+      box-shadow: inset 0 -3px 0 #b3904b, 0 4px 0 #5b451f;
     }
-    .stat b {
-      display: block;
-      color: var(--accent);
-      font-size: 1.2rem;
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #3b5211;
+      line-height: 1;
+      text-shadow: 1px 1px 0 #fef1b9;
     }
-    @media (min-height: 800px) {
-      #vera { font-size: 240px; }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: #5e3d17;
     }
-    @media (min-height: 1000px) {
-      #vera { font-size: 300px; }
+
+    /* Школьные эмодзи вместо картинок */
+    .decor {
+      position: absolute;
+      font-size: 40px;
+      opacity: 0.3;
+      pointer-events: none;
     }
+
+    .decor-1 { top: 10px; left: 10px; }
+    .decor-2 { bottom: 60px; right: 10px; transform: rotate(10deg); }
+    .decor-3 { top: 40%; left: 5px; }
   </style>
 </head>
 <body>
 <div id="root">
-  <header>
-    <div class="level">Уровень <span id="lvl">1</span> • Вера Николаевна</div>
-    <div class="score" id="coins">0</div>
-    <div class="energy-bar">
+  <!-- Школьные декорации эмодзи (имитация фоток) -->
+  <div class="decor decor-1">📚</div>
+  <div class="decor decor-2">✏️</div>
+  <div class="decor decor-3">🧪</div>
+
+  <div class="chalkboard-header">
+    <div class="teacher-name">
+      👩‍🏫 Вера Николаевна <span>Класс 7 «Б»</span>
+    </div>
+    <div class="score-board">
+      <span class="score-number" id="coins">0</span>
+    </div>
+  </div>
+
+  <div class="energy-block">
+    <div class="energy-label">
+      <span>🔋 Энергия учителя</span>
+      <span id="energyText">1000/1000</span>
+    </div>
+    <div class="energy-track">
       <div class="energy-fill" id="energyFill" style="width:100%"></div>
     </div>
-  </header>
+  </div>
 
-  <div id="vera">🧮</div>
+  <div class="teacher-click-area" id="clickArea">
+    <div class="teacher-emoji" id="vera">👩‍🏫</div>
+  </div>
 
-  <div class="bottom-bar">
-    <div class="stat">Энергия<br><b id="energyText">1000/1000</b></div>
-    <div class="stat">в сек<br><b id="passive">0.0</b></div>
-    <div class="stat">Тапы<br><b id="taps">0</b></div>
+  <div class="bottom-stats">
+    <div class="stat-item">
+      <div class="stat-value" id="passive">0.0</div>
+      <div class="stat-label">📈 в сек</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="taps">0</div>
+      <div class="stat-label">👆 проверок</div>
+    </div>
   </div>
 </div>
 
 <script>
-const tg = window.Telegram.WebApp;
-tg.ready();
-tg.expand();
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();
 
-let state = {
-  coins: 0,
-  level: 1,
-  energy: 1000,
-  maxEnergy: 1000,
-  passivePerSec: 0,
-  tapsCount: 0,
-  lastEnergyTime: Date.now(),
-  tapValue: 1,
-  energyPerTap: 1,
-  upgradesBought: {}
-};
+  // Состояние с исправленным восстановлением энергии (не мгновенно)
+  let state = {
+    coins: 0,
+    level: 1,
+    energy: 1000,
+    maxEnergy: 1000,
+    passivePerSec: 0.5,  // стартовый пассив
+    tapsCount: 0,
+    lastEnergyTime: Date.now(),
+    tapValue: 1,
+    energyPerTap: 2,      // тратим 2 энергии за тап
+  };
 
-// Заглушка синхронизации (в продакшене — отправлять на сервер через tg.sendData или fetch)
-function saveState() {
-  // Здесь можно отправить данные на бэкенд
-  // tg.sendData(JSON.stringify(state));
-  localStorage.setItem("vera_state", JSON.stringify(state));
-}
-
-function loadState() {
-  const saved = localStorage.getItem("vera_state");
-  if (saved) {
-    Object.assign(state, JSON.parse(saved));
+  // Загрузка
+  function loadState() {
+    const saved = localStorage.getItem('vera_school_state');
+    if (saved) {
+      Object.assign(state, JSON.parse(saved));
+    }
+    render();
   }
-  render();
-}
 
-function render() {
-  document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
-  document.getElementById("lvl").textContent = state.level;
-  document.getElementById("energyText").textContent = `${Math.floor(state.energy)}/${state.maxEnergy}`;
-  document.getElementById("passive").textContent = state.passivePerSec.toFixed(1);
-  document.getElementById("taps").textContent = state.tapsCount.toLocaleString();
+  function saveState() {
+    localStorage.setItem('vera_school_state', JSON.stringify(state));
+    // Для Telegram WebApp можно отправить данные, но пока локально
+  }
 
-  const pct = (state.energy / state.maxEnergy) * 100;
-  document.getElementById("energyFill").style.width = pct + "%";
-}
+  function render() {
+    document.getElementById('coins').innerText = Math.floor(state.coins).toLocaleString();
+    document.getElementById('energyText').innerText = `${Math.floor(state.energy)}/${state.maxEnergy}`;
+    const energyPercent = (state.energy / state.maxEnergy) * 100;
+    document.getElementById('energyFill').style.width = energyPercent + '%';
+    document.getElementById('passive').innerText = state.passivePerSec.toFixed(1);
+    document.getElementById('taps').innerText = state.tapsCount.toLocaleString();
+  }
 
-let lastTapTime = 0;
+  // Частицы мела
+  function createChalkParticle(x, y) {
+    const p = document.createElement('div');
+    p.className = 'chalk-particle';
+    p.textContent = '✧ +' + state.tapValue;
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1200);
+  }
 
-function createParticle(x, y) {
-  const p = document.createElement("div");
-  p.className = "particle";
-  p.textContent = "+" + state.tapValue;
-  p.style.left = x + "px";
-  p.style.top = y + "px";
-  document.body.appendChild(p);
-  setTimeout(() => p.remove(), 1400);
-}
+  // Обработка клика/тапа
+  function handleTap(e) {
+    e.preventDefault?.(); // для touch
 
-function onTap(e) {
-  const now = Date.now();
-  if (now - lastTapTime < 40) return; // защита от слишком быстрого спама
-  lastTapTime = now;
+    if (state.energy < state.energyPerTap) {
+      // недостаточно энергии — мелодия? пока просто вибрация (если поддерживает)
+      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+      return;
+    }
 
-  if (state.energy < state.energyPerTap) return;
+    state.energy -= state.energyPerTap;
+    state.coins += state.tapValue;
+    state.tapsCount++;
 
-  state.energy -= state.energyPerTap;
-  state.coins += state.tapValue;
-  state.tapsCount++;
+    // координаты для частиц
+    let clientX, clientY;
+    if (e.touches) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    createChalkParticle(clientX, clientY);
 
-  const x = e.touches ? e.touches[0].clientX : e.clientX;
-  const y = e.touches ? e.touches[0].clientY : e.clientY;
-  createParticle(x, y);
+    // легкая вибрация при удачном клике
+    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 
-  render();
-  saveState();
-}
+    render();
+    saveState();
+  }
 
-// Пассивный доход + восстановление энергии
-function gameLoop() {
-  const now = Date.now();
-  const dt = (now - state.lastEnergyTime) / 1000;
-  state.lastEnergyTime = now;
+  // ГЕЙМЛУП — пассивный доход и ВОССТАНОВЛЕНИЕ ЭНЕРГИИ (исправлено: не мгновенно)
+  function gameTick() {
+    const now = Date.now();
+    const deltaSec = (now - (state.lastEnergyTime || now)) / 1000;
+    if (deltaSec > 0.1) { // не слишком частые обновления
+      // Пассивный доход
+      state.coins += state.passivePerSec * deltaSec;
 
-  // пассив
-  state.coins += state.passivePerSec * dt;
+      // Восстанавливаем энергию: 2% в секунду от максимума (но не больше максимума)
+      const regenRate = 0.02; // 2% в секунду
+      const energyRegen = state.maxEnergy * regenRate * deltaSec;
+      state.energy = Math.min(state.maxEnergy, state.energy + energyRegen);
 
-  // восстановление энергии
-  const regen = 60; // +60 энергии в минуту → 1 в секунду
-  state.energy = Math.min(state.maxEnergy, state.energy + regen * dt);
+      state.lastEnergyTime = now;
+      render();
+      saveState();
+    }
+  }
 
-  render();
-}
+  // Привязка событий
+  const clickArea = document.getElementById('clickArea');
+  clickArea.addEventListener('mousedown', handleTap);
+  clickArea.addEventListener('touchstart', handleTap, { passive: false });
+  // запрещаем контекстное меню
+  clickArea.addEventListener('contextmenu', (e) => e.preventDefault());
 
-document.getElementById("vera").addEventListener("pointerdown", onTap);
-document.getElementById("vera").addEventListener("touchstart", onTap);
+  // Запуск
+  loadState();
+  setInterval(gameTick, 300); // чаще для плавности
 
-loadState();
-setInterval(gameLoop, 800);
-
-// При старте можно запросить данные с сервера (опционально)
-// fetch('/api/load?user=' + tg.initDataUnsafe.user?.id).then(...)
-
-tg.MainButton.setText("Купить улучшения").show();
-tg.MainButton.onClick(() => {
-  alert("Магазин пока в разработке!\n\nСкоро появятся:\n• Доска ➜ +1 за тап\n• Кофе Веры ➜ +энергия\n• Журнал успеваемости ➜ пассив\n• Двойной контрольный ➜ ×2 множитель");
-});
-
+  // Кнопка магазина
+  tg.MainButton.setText('📚 Школьная лавка').show();
+  tg.MainButton.onClick(() => {
+    alert('🧑‍🏫 Вера Николаевна:\n\n«Скоро принесёт журнал и указку!»\n\n• Доска почёта: +1 за тап\n• Указка: +энергия\n• Стопка тетрадей: пассив');
+  });
 </script>
 </body>
 </html>
