@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Вера Николаевна · Империя</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <style>
     :root {
       --bg: #0f180f;
@@ -117,6 +120,7 @@
       justify-content: center;
       position: relative;
       padding: 10px;
+      min-height: 320px;
     }
 
     .user-photo {
@@ -148,7 +152,6 @@
       100% { opacity: 0; transform: translateY(-140px) scale(0.7); }
     }
 
-    /* Нижняя панель вкладок – всегда видна */
     .bottom-tabs {
       background: rgba(10, 20, 10, 0.98);
       border-top: 2px solid rgba(0,255,170,0.35);
@@ -270,10 +273,10 @@
     </div>
   </div>
 
-  <!-- Главная область с фото по центру -->
+  <!-- Фото по центру экрана -->
   <div class="click-area" id="clickArea">
     <img id="userPhoto" class="user-photo" 
-         src="https://cdn.discordapp.com/attachments/1467065771107811428/1481643255975248064/image.png"
+         src="https://files.oaiusercontent.com/file-0a0XjK4zL0XjK4zL0XjK4zL0?se=2026-03-13T00%3A00%3A00Z&sp=r&sv=2024-08-04&sr=b&rscca=1&sig=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
          alt="Вера Николаевна">
   </div>
 
@@ -293,7 +296,7 @@
     <div id="statsTab" style="display:none;" class="card">Статистика (пока пусто)</div>
   </div>
 
-  <!-- Нижняя панель вкладок – всегда видна -->
+  <!-- Нижняя панель вкладок -->
   <div class="bottom-tabs">
     <div class="tab active" data-tab="upgrades">Улучшения</div>
     <div class="tab" data-tab="promo">Промо</div>
