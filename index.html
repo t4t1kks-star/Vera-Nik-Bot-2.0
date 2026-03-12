@@ -7,1180 +7,509 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
+      margin: 0; padding: 0; box-sizing: border-box;
+      user-select: none; -webkit-tap-highlight-color: transparent;
     }
-
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #1a2f1f;
-      height: 100vh;
-      overflow: hidden;
-      touch-action: manipulation;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f1a0f;
+      color: #e8f5e9;
+      height: 100vh; overflow: hidden;
     }
-
     #root {
       height: 100%;
-      display: flex;
-      flex-direction: column;
-      background: linear-gradient(145deg, #2a401f, #1d2e15);
-      position: relative;
+      display: flex; flex-direction: column;
+      background: linear-gradient(145deg, #1b2e1b, #0f1a0f);
     }
-
-    /* Шапка с профилем */
     .header {
-      background: #4a6b2f;
-      padding: 12px 16px 8px;
-      border-bottom: 4px solid #e6c87c;
-      box-shadow: 0 4px 0 #3d4f24;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      background: #2e5d2e;
+      padding: 12px 16px;
+      border-bottom: 3px solid #c9a547;
+      display: flex; align-items: center; gap: 12px;
     }
-
     .tg-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: #7b5e3b;
-      border: 3px solid #f9e0a0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      color: white;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #4a704a; border: 3px solid #d4b874;
       overflow: hidden;
-      flex-shrink: 0;
     }
+    .tg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .user-name { font-size: 1.3rem; font-weight: bold; color: #fff9e6; }
+    .user-class { font-size: 0.9rem; color: #d4e8c8; }
 
-    .tg-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .user-info {
-      flex: 1;
-    }
-
-    .user-name {
-      color: #fef7d6;
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-shadow: 2px 2px 0 #3a5520;
-      margin-bottom: 2px;
-    }
-
-    .user-class {
-      color: #ffd966;
-      font-size: 0.8rem;
-      background: #2e4a1e;
-      display: inline-block;
-      padding: 2px 12px;
-      border-radius: 20px;
-      border: 1px solid #c9a454;
-    }
-
-    /* Счет */
     .score-panel {
-      background: #345e2e;
-      margin: 12px 16px;
-      padding: 12px;
-      border-radius: 30px;
-      border: 3px solid #ba9f6c;
-      box-shadow: inset 0 -3px 0 #1e3a18, 0 6px 0 #264d1a;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      margin: 12px 16px; padding: 12px 20px;
+      background: #234923; border-radius: 24px;
+      border: 2px solid #b89f5c; box-shadow: 0 4px 0 #1a361a;
+      display: flex; justify-content: space-between; align-items: center;
     }
-
-    .score-label {
-      color: #f5e2b2;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-    }
-
     .score-value {
-      font-size: 2.8rem;
-      font-weight: 900;
-      color: #fefae0;
-      text-shadow: 3px 3px 0 #5a3e1f, 5px 5px 0 #2b4b2b;
-      line-height: 1;
+      font-size: 2.8rem; font-weight: 900; color: #ffeb3b;
       font-family: 'Courier New', monospace;
     }
 
-    /* Энергия */
-    .energy-container {
-      padding: 0 16px 10px;
-    }
-
-    .energy-header {
-      display: flex;
-      justify-content: space-between;
-      color: #edd5a8;
-      margin-bottom: 4px;
-      font-size: 0.9rem;
-    }
-
+    .energy-container { padding: 0 16px 8px; }
     .energy-bar-bg {
-      height: 20px;
-      background: #3a281c;
-      border-radius: 30px;
-      border: 2px solid #785f34;
+      height: 20px; background: #1e2e1e;
+      border-radius: 30px; border: 2px solid #5c8a5c;
       overflow: hidden;
     }
-
     .energy-fill {
-      height: 100%;
-      width: 100%;
-      background: linear-gradient(90deg, #f6b83d, #ffdd87);
-      transition: width 0.3s ease;
+      height: 100%; background: linear-gradient(90deg, #ffca28, #fff176);
+      transition: width 0.4s ease;
     }
 
-    /* Фото по центру */
     .click-area {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      cursor: pointer;
-      margin: 8px 0;
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      position: relative; cursor: pointer;
     }
-
     .user-photo {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      border: 6px solid #e6c87c;
-      box-shadow: 0 20px 25px -8px black, 0 0 0 4px #4a6b2f;
-      object-fit: cover;
-      transition: transform 0.1s ease;
+      width: 240px; height: 240px; border-radius: 50%;
+      border: 8px solid #d4b874; box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+      object-fit: cover; transition: transform 0.12s;
     }
+    .user-photo:active { transform: scale(0.94); }
 
-    .user-photo:active {
-      transform: scale(0.92);
-    }
-
-    /* Частицы */
     .particle {
-      position: absolute;
-      font-size: 28px;
-      font-weight: bold;
-      color: #ffd966;
-      text-shadow: 2px 2px 0 #7a4d1a;
-      pointer-events: none;
-      z-index: 100;
-      animation: floatUp 1s forwards;
+      position: absolute; font-size: 2.2rem; font-weight: bold;
+      color: #ffeb3b; text-shadow: 2px 2px 6px #000;
+      pointer-events: none; animation: floatUp 1.2s forwards;
     }
-
     @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-      100% { opacity: 0; transform: translateY(-120px) rotate(15deg); }
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-160px) scale(0.7); }
     }
 
-    /* Вкладки */
     .tabs {
-      display: flex;
-      background: #4f7535;
-      border-top: 3px solid #e6c87c;
-      padding: 8px 8px 0;
-      gap: 4px;
-      overflow-x: auto;
-      scrollbar-width: none;
+      display: flex; background: #2e5d2e;
+      border-top: 2px solid #c9a547; padding: 8px;
+      gap: 6px; overflow-x: auto; scrollbar-width: none;
     }
-
-    .tabs::-webkit-scrollbar {
-      display: none;
-    }
-
+    .tabs::-webkit-scrollbar { display: none; }
     .tab {
-      flex: 1;
-      min-width: 90px;
-      text-align: center;
-      padding: 12px 0;
-      background: #3e6329;
-      color: #efdba8;
-      border-radius: 20px 20px 0 0;
-      font-weight: bold;
-      border: 2px solid #a5874b;
-      border-bottom: none;
-      cursor: pointer;
-      transition: 0.2s;
+      flex: 1; min-width: 80px; padding: 12px 0;
+      background: #1f471f; color: #c8e6c9;
+      border-radius: 16px 16px 0 0; text-align: center;
+      font-weight: 600; border: 1px solid #8a6d3b;
+      transition: all 0.2s;
     }
-
     .tab.active {
-      background: #fcf0cf;
-      color: #2b4a1a;
-      transform: translateY(-4px);
+      background: #fffde7; color: #1b5e20; transform: translateY(-3px);
     }
 
-    /* Контент */
     .tab-content {
-      background: #fcf0cf;
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      border-top: 4px solid #c9a454;
-      box-shadow: inset 0 10px 15px -10px #7b5e3b;
+      background: #f5f5f5; color: #1b5e20;
+      flex: 1; overflow-y: auto; padding: 16px;
+      border-top: 3px solid #b89f5c;
     }
 
-    /* Карточки */
     .card {
-      background: #fff9e6;
-      border: 3px solid #b68f4c;
-      border-radius: 20px;
-      padding: 15px;
-      margin-bottom: 12px;
-      box-shadow: 0 5px 0 #7b5e3b;
+      background: white; border: 2px solid #c9a547;
+      border-radius: 16px; padding: 16px; margin-bottom: 12px;
+      box-shadow: 0 4px 0 #8a6d3b;
     }
 
-    .upgrade-item {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
+    .upgrade-item { display: flex; align-items: center; gap: 16px; }
     .upgrade-emoji {
-      font-size: 40px;
-      background: #4a6b2f;
-      width: 70px;
-      height: 70px;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 3px solid #eec27e;
-    }
-
-    .upgrade-info {
-      flex: 1;
-    }
-
-    .upgrade-name {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #2b4a1a;
-    }
-
-    .upgrade-desc {
-      color: #765e31;
-      font-size: 0.8rem;
-    }
-
-    .upgrade-price {
-      color: #b6562e;
-      font-weight: bold;
-      font-size: 1.3rem;
+      font-size: 48px; width: 80px; height: 80px;
+      background: #2e5d2e; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      border: 3px solid #ffca28;
     }
 
     .buy-btn {
-      background: #4f8b3a;
-      border: none;
-      color: white;
-      font-weight: bold;
-      padding: 10px 20px;
-      border-radius: 30px;
-      border-bottom: 4px solid #2a551a;
-      font-size: 1rem;
-      cursor: pointer;
+      background: #388e3c; color: white; font-weight: bold;
+      padding: 12px 24px; border: none; border-radius: 999px;
+      font-size: 1.05rem; cursor: pointer;
+      box-shadow: 0 5px 0 #1b5e20; transition: all 0.15s;
+      min-width: 110px;
     }
-
     .buy-btn:active {
-      transform: translateY(2px);
-      border-bottom-width: 2px;
+      transform: translateY(3px); box-shadow: 0 2px 0 #1b5e20;
     }
-
     .buy-btn.disabled {
-      opacity: 0.5;
-      pointer-events: none;
+      background: #78909c; opacity: 0.6; cursor: not-allowed;
+      box-shadow: none;
     }
 
-    /* Топ-лидеров */
-    .leaderboard-item {
-      display: flex;
-      align-items: center;
-      background: #e9dbbd;
-      margin-bottom: 8px;
-      padding: 8px 15px;
-      border-radius: 40px;
-      border: 2px solid #b68f4c;
-      gap: 10px;
-    }
-
-    .rank {
-      font-size: 1.5rem;
-      font-weight: 900;
-      width: 40px;
-      color: #9e6d3b;
-    }
-
-    .leader-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #7b5e3b;
-      border: 2px solid #e6c87c;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      color: white;
-    }
-
-    .leader-name {
-      flex: 1;
-      font-weight: bold;
-      color: #2d421b;
-    }
-
-    .leader-score {
-      font-weight: 900;
-      color: #b6562e;
-    }
-
-    .leader-total {
-      font-size: 0.7rem;
-      color: #765e31;
-      margin-left: 5px;
-    }
-
-    /* Карточки ежедневной награды */
-    .daily-row {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding: 5px 0;
-    }
-
-    .daily-card {
-      min-width: 80px;
-      background: #4a6b2f;
-      border: 2px solid #e6c87c;
-      border-radius: 20px;
-      padding: 10px;
-      text-align: center;
-      color: #fefae0;
-    }
-
-    .daily-card.active {
-      background: #f6b83d;
-      color: #2b4a1a;
-    }
-
-    /* Статистика */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .stat-box {
-      background: #4a6b2f;
-      border: 2px solid #e6c87c;
-      border-radius: 15px;
-      padding: 10px;
-      text-align: center;
-      color: #fefae0;
-    }
-
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #ffd966;
-    }
-
-    /* Кнопка скрытия */
     .hide-btn {
-      background: none;
-      border: none;
-      color: #765e31;
-      font-size: 1.2rem;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-
-    .hidden-upgrade {
-      display: none !important;
-    }
-
-    /* Анимации */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    .bonus-animation {
-      animation: pulse 0.5s ease;
+      background: none; border: none; color: #757575;
+      font-size: 1.4rem; cursor: pointer; padding: 8px;
     }
   </style>
 </head>
 <body>
 <div id="root">
-  <!-- Шапка -->
   <div class="header">
-    <div class="tg-avatar" id="avatarContainer">
-      <span id="avatarPlaceholder">👤</span>
-    </div>
-    <div class="user-info">
+    <div class="tg-avatar" id="avatarContainer"><span id="avatarPlaceholder">👤</span></div>
+    <div>
       <div class="user-name" id="tgName">Загрузка...</div>
-      <div class="user-class">9 класс • Ранг: <span id="userRank">Новичок</span></div>
+      <div class="user-class">9 класс • <span id="userRank">Новичок</span></div>
     </div>
   </div>
 
-  <!-- Счет и энергия -->
   <div class="score-panel">
-    <span class="score-label">📚 Всего тетрадей</span>
+    <span>📚 Всего тетрадей</span>
     <span class="score-value" id="coins">0</span>
   </div>
 
   <div class="energy-container">
-    <div class="energy-header">
-      <span>🔋 Энергия <span id="energyRegenInfo">(+1%/сек)</span></span>
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+      <span>🔋 Энергия</span>
       <span id="energyText">500/500</span>
     </div>
-    <div class="energy-bar-bg">
-      <div class="energy-fill" id="energyFill" style="width:100%"></div>
-    </div>
+    <div class="energy-bar-bg"><div class="energy-fill" id="energyFill"></div></div>
   </div>
 
-  <!-- Кликабельное фото -->
   <div class="click-area" id="clickArea">
-    <img id="userPhoto" class="user-photo" src="https://cdn.discordapp.com/attachments/1467065771107811428/1481643255975248064/image.png?ex=69b40f4f&is=69b2bdcf&hm=f0dc4a03b96184fc8531080dbb0d65e000fe9485a868dd870814dc2c0996786a&" alt="Вера Николаевна">
+    <img id="userPhoto" class="user-photo" src="https://cdn.discordapp.com/attachments/1467065771107811428/1481643255975248064/image.png" alt="Вера Николаевна">
   </div>
 
-  <!-- Вкладки -->
   <div class="tabs">
     <div class="tab active" data-tab="upgrades">📈 Прокачка</div>
     <div class="tab" data-tab="daily">📅 Ежедневно</div>
     <div class="tab" data-tab="stats">📊 Статистика</div>
     <div class="tab" data-tab="leaderboard">🏆 Топ-15</div>
-    <div class="tab" data-tab="achievements">⭐ Достижения</div>
   </div>
 
-  <!-- Контент -->
   <div id="tabContent" class="tab-content">
-    <!-- Прокачка -->
     <div id="upgradesTab">
-      <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span>🏪 Магазин улучшений</span>
-        <button id="toggleHiddenBtn" style="background: #4a6b2f; color: white; border: none; padding: 5px 15px; border-radius: 20px;">🔍 Скрыть купленное</button>
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+        <span>Магазин улучшений</span>
+        <button id="toggleHiddenBtn">Скрыть купленное</button>
       </div>
       <div id="upgradesList"></div>
     </div>
-    
-    <!-- Ежедневно -->
-    <div id="dailyTab" class="hidden">
-      <div class="card">
-        <h3 style="color: #2b4a1a; margin-bottom: 15px;">📅 Ежедневная награда</h3>
-        <div class="daily-row" id="dailyRewards"></div>
-        <div style="text-align: center; margin-top: 15px;">
-          <button id="claimDailyBtn" class="buy-btn">Забрать награду</button>
-        </div>
-      </div>
-      
-      <div class="card">
-        <h3 style="color: #2b4a1a; margin-bottom: 15px;">⏰ Бонус времени</h3>
-        <div id="timeBonus">Доступно через: <span id="timeBonusTimer">00:00</span></div>
-        <button id="claimTimeBonusBtn" class="buy-btn" style="margin-top: 10px;" disabled>Забрать</button>
-      </div>
-    </div>
-    
-    <!-- Статистика -->
-    <div id="statsTab" class="hidden">
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div>👆 Всего кликов</div>
-          <div class="stat-value" id="statTotalClicks">0</div>
-        </div>
-        <div class="stat-box">
-          <div>📈 Доход/сек</div>
-          <div class="stat-value" id="statIncome">0</div>
-        </div>
-        <div class="stat-box">
-          <div>⚡ За клик</div>
-          <div class="stat-value" id="statPerClick">1</div>
-        </div>
-        <div class="stat-box">
-          <div>🔋 Макс энергия</div>
-          <div class="stat-value" id="statMaxEnergy">500</div>
-        </div>
-      </div>
-      
-      <div class="card">
-        <h3>📊 Подробная статистика</h3>
-        <div id="detailedStats"></div>
-      </div>
-    </div>
-    
-    <!-- Топ-15 -->
-    <div id="leaderboardTab" class="hidden"></div>
-    
-    <!-- Достижения -->
-    <div id="achievementsTab" class="hidden">
-      <div id="achievementsList"></div>
+
+    <div id="dailyTab" style="display:none;">Ежедневные награды (временно упрощено)</div>
+    <div id="statsTab" style="display:none;">Статистика (временно упрощено)</div>
+    <div id="leaderboardTab" style="display:none;">
+      <div id="leaderboardList"></div>
     </div>
   </div>
 </div>
 
 <script>
-  const tg = window.Telegram.WebApp;
-  tg.ready();
-  tg.expand();
+const tg = window.Telegram.WebApp;
+tg.ready(); tg.expand();
 
-  // ================== СОСТОЯНИЕ ==================
-  let state = {
-    coins: 0,
-    totalCoins: 0, // total заработанное за все время
-    energy: 500,
-    maxEnergy: 500,
-    tapsCount: 0,
-    totalTaps: 0,
-    lastEnergyTime: Date.now(),
-    tapValue: 1,
-    energyPerTap: 2,
-    passivePerSec: 0,
-    lastSave: Date.now(),
-    
-    // Улучшения
-    upgrades: {
-      pointer: 0,   // указка: +0.5 к тапу
-      notebook: 0,  // тетради: +0.5 пассив
-      desk: 0,      // стол: +25 макс энергии
-      exam: 0,      // контрольная: +1 пассив
-      chalk: 0,     // мел: +0.3 к тапу
-      journal: 0,   // журнал: +0.8 пассив
-      board: 0,     // доска: +40 макс энергии
-      coffee: 0,    // кофе: +2% реген энергии
-      diploma: 0    // диплом: x2 доход (спец)
-    },
-    
-    // Скрытые улучшения
-    hiddenUpgrades: [],
-    
-    // Ежедневка
-    dailyStreak: 0,
-    lastDaily: 0,
-    lastTimeBonus: 0,
-    
-    // Достижения
-    achievements: {},
-    
-    // Ранг
-    rank: 0
+let tgUser = { id: 0, first_name: 'Гость', photo_url: null };
+
+try {
+  if (tg.initDataUnsafe?.user) {
+    tgUser = tg.initDataUnsafe.user;
+    document.getElementById('tgName').textContent = tgUser.first_name || 'Ученик';
+    if (tgUser.photo_url) {
+      document.getElementById('avatarContainer').innerHTML = `<img src="${tgUser.photo_url}" alt="avatar">`;
+    } else {
+      document.getElementById('avatarPlaceholder').textContent = tgUser.first_name?.[0] || '👤';
+    }
+  }
+} catch(e) {}
+
+// Уникальный ключ сохранения именно для этого пользователя
+const STORAGE_KEY = 'school_empire_' + tgUser.id;
+
+// Глобальное состояние
+let state = {
+  coins: 0,
+  totalCoins: 0,
+  energy: 500,
+  maxEnergy: 500,
+  tapsCount: 0,
+  totalTaps: 0,
+  lastEnergyTime: Date.now(),
+  tapValue: 1,
+  energyPerTap: 2,
+  passivePerSec: 0,
+  upgrades: {
+    pointer: 0, notebook: 0, desk: 0, exam: 0, chalk: 0,
+    journal: 0, board: 0, coffee: 0, diploma: 0
+  },
+  hiddenUpgrades: [],
+  lastSave: Date.now(),
+  rank: 'Новичок'
+};
+
+// Глобальный топ (все игроки)
+let leaderboard = [];
+
+// ─── Загрузка ────────────────────────────────────────
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      // Защита от битых данных
+      if (data && typeof data === 'object') {
+        Object.assign(state, data);
+        // Исправляем возможные NaN / undefined
+        state.coins = Number(state.coins) || 0;
+        state.totalCoins = Number(state.totalCoins) || 0;
+        state.energy = Number(state.energy) || 500;
+        state.maxEnergy = Number(state.maxEnergy) || 500;
+      }
+    } catch(e) {
+      console.warn("Повреждённое сохранение → сброс");
+    }
+  }
+  applyUpgrades();
+  renderAll();
+}
+
+function saveState() {
+  state.lastSave = Date.now();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  saveToLeaderboard();
+}
+
+// ─── Лидерборд ───────────────────────────────────────
+function loadLeaderboard() {
+  const saved = localStorage.getItem('school_empire_global');
+  if (saved) {
+    try {
+      leaderboard = JSON.parse(saved).filter(p => p && p.id && p.totalCoins > 0);
+    } catch(e) {}
+  }
+}
+
+function saveToLeaderboard() {
+  if (state.totalCoins < 10) return; // не сохраняем почти пустых
+
+  loadLeaderboard(); // актуализируем перед записью
+
+  const player = {
+    id: tgUser.id,
+    name: tgUser.first_name || 'Аноним',
+    avatar: tgUser.photo_url || tgUser.first_name?.[0] || '👤',
+    totalCoins: Math.floor(state.totalCoins),
+    taps: state.totalTaps || state.tapsCount,
+    lastSeen: Date.now()
   };
 
-  // Данные пользователя
-  let tgUser = {
-    id: Math.floor(Math.random() * 1000000),
-    first_name: 'Ученик',
-    username: 'schoolboy',
-    photo_url: null
-  };
-
-  try {
-    if (tg.initDataUnsafe?.user) {
-      tgUser = tg.initDataUnsafe.user;
-      document.getElementById('tgName').innerText = tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : '');
-      if (tgUser.photo_url) {
-        const img = document.createElement('img');
-        img.src = tgUser.photo_url;
-        document.getElementById('avatarContainer').innerHTML = '';
-        document.getElementById('avatarContainer').appendChild(img);
-      } else {
-        document.getElementById('avatarPlaceholder').innerText = tgUser.first_name?.[0] || '👤';
-      }
+  const index = leaderboard.findIndex(p => p.id === player.id);
+  if (index >= 0) {
+    if (player.totalCoins > leaderboard[index].totalCoins) {
+      leaderboard[index] = player;
     }
-  } catch (e) {}
-
-  // ================== ТОП-15 С TOTAL ==================
-  let allPlayers = [];
-
-  function loadAllPlayers() {
-    const saved = localStorage.getItem('school_empire_all');
-    if (saved) {
-      allPlayers = JSON.parse(saved);
-    } else {
-      allPlayers = [];
-    }
+  } else {
+    leaderboard.push(player);
   }
 
-  function saveCurrentPlayer() {
-    if (state.totalTaps === 0 && state.totalCoins === 0) return;
+  // Сортируем и оставляем топ-50 (для запаса)
+  leaderboard.sort((a,b) => b.totalCoins - a.totalCoins);
+  leaderboard = leaderboard.slice(0, 50);
 
-    const existingIndex = allPlayers.findIndex(p => p.id === tgUser.id);
-    const playerData = {
-      id: tgUser.id,
-      name: tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : ''),
-      avatar: tgUser.photo_url || tgUser.first_name?.[0] || '👤',
-      totalCoins: Math.floor(state.totalCoins || state.coins), // total заработанное
-      taps: state.totalTaps || state.tapsCount,
-      rank: calculateRank()
-    };
+  localStorage.setItem('school_empire_global', JSON.stringify(leaderboard));
+  renderLeaderboard();
+}
 
-    if (existingIndex >= 0) {
-      // Обновляем только если total больше
-      if (playerData.totalCoins > allPlayers[existingIndex].totalCoins) {
-        allPlayers[existingIndex] = playerData;
-      }
-    } else {
-      allPlayers.push(playerData);
-    }
+// ─── Улучшения ───────────────────────────────────────
+const upgradesList = [
+  {id:'pointer',   name:'Указка',     basePrice:50,   effect: lv => state.tapValue = 1 + lv*0.5},
+  {id:'notebook',  name:'Тетради',    basePrice:80,   effect: lv => state.passivePerSec += lv*0.5},
+  {id:'desk',      name:'Стол',       basePrice:120,  effect: lv => state.maxEnergy = 500 + lv*25},
+  {id:'chalk',     name:'Мел',        basePrice:150,  effect: ()=>{}},
+  {id:'exam',      name:'Контрольная',basePrice:200,  effect: lv => state.passivePerSec += lv*1},
+  {id:'journal',   name:'Журнал',     basePrice:300,  effect: lv => state.passivePerSec += lv*0.8},
+  {id:'board',     name:'Доска',      basePrice:400,  effect: lv => state.maxEnergy += lv*40},
+  {id:'coffee',    name:'Кофе',       basePrice:500,  effect: ()=>{}},
+  {id:'diploma',   name:'Диплом',     basePrice:5000, effect: ()=>{}},
+];
 
-    // Сортируем по totalCoins и оставляем топ-15 с >0 кликов
-    allPlayers = allPlayers
-      .filter(p => p.taps > 0)
-      .sort((a, b) => b.totalCoins - a.totalCoins)
-      .slice(0, 15);
+function applyUpgrades() {
+  state.passivePerSec = 0;
+  state.tapValue = 1 + (state.upgrades.pointer || 0)*0.5 + (state.upgrades.chalk || 0)*0.3;
+  state.passivePerSec += (state.upgrades.notebook || 0)*0.5;
+  state.passivePerSec += (state.upgrades.exam || 0)*1;
+  state.passivePerSec += (state.upgrades.journal || 0)*0.8;
+  state.maxEnergy = 500 + (state.upgrades.desk || 0)*25 + (state.upgrades.board || 0)*40;
 
-    localStorage.setItem('school_empire_all', JSON.stringify(allPlayers));
+  if (state.upgrades.diploma > 0) {
+    state.tapValue *= 2;
+    state.passivePerSec *= 2;
   }
 
-  function calculateRank() {
-    const total = state.totalCoins || state.coins;
-    if (total < 1000) return 'Новичок';
-    if (total < 5000) return 'Ученик';
-    if (total < 10000) return 'Звезда класса';
-    if (total < 50000) return 'Отличник';
-    if (total < 100000) return 'Гордость школы';
-    return 'Легенда';
-  }
+  if (state.energy > state.maxEnergy) state.energy = state.maxEnergy;
+}
 
-  // ================== ДОСТИЖЕНИЯ ==================
-  const achievementsList = [
-    { id: 'tap100', name: 'Первые шаги', desc: 'Сделать 100 кликов', target: 100, reward: 500 },
-    { id: 'tap1000', name: 'Старательный ученик', desc: 'Сделать 1000 кликов', target: 1000, reward: 2000 },
-    { id: 'tap10000', name: 'Трудоголик', desc: 'Сделать 10000 кликов', target: 10000, reward: 10000 },
-    { id: 'coins1000', name: 'Первые тетради', desc: 'Заработать 1000', target: 1000, reward: 500 },
-    { id: 'coins10000', name: 'Богатенький', desc: 'Заработать 10000', target: 10000, reward: 2000 },
-    { id: 'coins100000', name: 'Магнат', desc: 'Заработать 100000', target: 100000, reward: 10000 }
-  ];
+function getPrice(upId, level) {
+  const base = upgradesList.find(u => u.id === upId)?.basePrice || 100;
+  return Math.floor(base * Math.pow(1.55, level));
+}
 
-  function checkAchievements() {
-    achievementsList.forEach(ach => {
-      if (!state.achievements[ach.id]) {
-        let progress = 0;
-        if (ach.id.includes('tap')) progress = state.totalTaps || state.tapsCount;
-        else progress = state.totalCoins || state.coins;
-        
-        if (progress >= ach.target) {
-          state.achievements[ach.id] = true;
-          state.coins += ach.reward;
-          showNotification(`🏆 Достижение: ${ach.name} +${ach.reward}`);
-        }
-      }
-    });
-  }
+// ─── Рендер ──────────────────────────────────────────
+function renderAll() {
+  document.getElementById('coins').textContent = Math.floor(state.coins).toLocaleString();
+  document.getElementById('energyText').textContent = `${Math.floor(state.energy)}/${state.maxEnergy}`;
+  document.getElementById('energyFill').style.width = (state.energy / state.maxEnergy * 100) + '%';
+  document.getElementById('userRank').textContent = state.rank || 'Новичок';
+  renderUpgrades();
+  renderLeaderboard();
+}
 
-  // ================== УЛУЧШЕНИЯ ==================
-  const upgradesList = [
-    { 
-      id: 'pointer', 
-      name: 'Указка', 
-      desc: 'Увеличивает доход за тап', 
-      income: '+0.5 за тап',
-      emoji: '🪄', 
-      basePrice: 50,
-      maxLevel: 20,
-      effect: (level) => { state.tapValue = 1 + level * 0.5; }
-    },
-    { 
-      id: 'notebook', 
-      name: 'Тетради', 
-      desc: 'Приносят пассивный доход', 
-      income: '+0.5/сек',
-      emoji: '📚', 
-      basePrice: 80,
-      maxLevel: 20,
-      effect: (level) => { state.passivePerSec = level * 0.5; }
-    },
-    { 
-      id: 'desk', 
-      name: 'Учительский стол', 
-      desc: 'Увеличивает максимум энергии', 
-      income: '+25 энергии',
-      emoji: '🪑', 
-      basePrice: 120,
-      maxLevel: 15,
-      effect: (level) => { 
-        state.maxEnergy = 500 + level * 25;
-        if (state.energy > state.maxEnergy) state.energy = state.maxEnergy;
-      }
-    },
-    { 
-      id: 'exam', 
-      name: 'Контрольная', 
-      desc: 'Дополнительный пассив', 
-      income: '+1/сек',
-      emoji: '📝', 
-      basePrice: 200,
-      maxLevel: 15,
-      effect: (level) => { /* считается отдельно */ }
-    },
-    { 
-      id: 'chalk', 
-      name: 'Мел', 
-      desc: 'Увеличивает доход за тап', 
-      income: '+0.3 за тап',
-      emoji: '✏️', 
-      basePrice: 150,
-      maxLevel: 25,
-      effect: (level) => { /* суммарно с указкой */ }
-    },
-    { 
-      id: 'journal', 
-      name: 'Журнал', 
-      desc: 'Мощный пассив', 
-      income: '+0.8/сек',
-      emoji: '📒', 
-      basePrice: 300,
-      maxLevel: 15,
-      effect: (level) => { /* пассив */ }
-    },
-    { 
-      id: 'board', 
-      name: 'Школьная доска', 
-      desc: 'Сильно увеличивает энергию', 
-      income: '+40 энергии',
-      emoji: '📋', 
-      basePrice: 400,
-      maxLevel: 10,
-      effect: (level) => { 
-        state.maxEnergy = 500 + (state.upgrades.desk * 25) + (level * 40);
-      }
-    },
-    { 
-      id: 'coffee', 
-      name: 'Кофе', 
-      desc: 'Ускоряет регенерацию энергии', 
-      income: '+2% реген',
-      emoji: '☕', 
-      basePrice: 500,
-      maxLevel: 10,
-      effect: (level) => { /* реген в gameLoop */ }
-    },
-    { 
-      id: 'diploma', 
-      name: 'Красный диплом', 
-      desc: 'УДВАИВАЕТ весь доход!', 
-      income: 'x2 множитель',
-      emoji: '🎓', 
-      basePrice: 5000,
-      maxLevel: 1,
-      effect: (level) => { /* множитель в доходах */ }
-    }
-  ];
+function renderUpgrades() {
+  const container = document.getElementById('upgradesList');
+  const hideBought = document.getElementById('toggleHiddenBtn').textContent.includes('Скрыть');
 
-  function calculateIncome() {
-    let tapBonus = 1 + (state.upgrades.pointer * 0.5) + (state.upgrades.chalk * 0.3);
-    let passiveBonus = (state.upgrades.notebook * 0.5) + (state.upgrades.exam * 1) + (state.upgrades.journal * 0.8);
-    
-    if (state.upgrades.diploma > 0) {
-      tapBonus *= 2;
-      passiveBonus *= 2;
-    }
-    
-    return { tapBonus, passiveBonus };
-  }
+  let html = '';
+  upgradesList.forEach(up => {
+    let level = state.upgrades[up.id] || 0;
+    if (level >= 20) return; // лимит условный
 
-  // ================== ФУНКЦИИ ==================
-  function saveState() {
-    state.lastSave = Date.now();
-    localStorage.setItem('school_empire_' + tgUser.id, JSON.stringify(state));
-    saveCurrentPlayer();
-  }
+    if (hideBought && level > 0) return;
 
-  function loadState() {
-    const saved = localStorage.getItem('school_empire_' + tgUser.id);
-    if (saved) {
-      Object.assign(state, JSON.parse(saved));
-    }
-    
-    // Применяем эффекты улучшений
-    upgradesList.forEach(up => {
-      if (state.upgrades[up.id] > 0 && up.effect) {
-        up.effect(state.upgrades[up.id]);
-      }
-    });
-    
-    updateRank();
-    render();
-    renderUpgrades();
-    renderLeaderboard();
-    renderAchievements();
-    renderDaily();
-  }
+    const price = getPrice(up.id, level);
+    const canBuy = state.coins >= price;
 
-  function updateRank() {
-    const rank = calculateRank();
-    document.getElementById('userRank').innerText = rank;
-  }
-
-  function render() {
-    document.getElementById('coins').innerText = Math.floor(state.coins).toLocaleString();
-    document.getElementById('energyText').innerText = `${Math.floor(state.energy)}/${state.maxEnergy}`;
-    const pct = (state.energy / state.maxEnergy) * 100;
-    document.getElementById('energyFill').style.width = pct + '%';
-    
-    // Статистика
-    document.getElementById('statTotalClicks').innerText = (state.totalTaps || state.tapsCount).toLocaleString();
-    
-    const income = calculateIncome();
-    document.getElementById('statIncome').innerText = income.passiveBonus.toFixed(1);
-    document.getElementById('statPerClick').innerText = Math.floor(income.tapBonus * 10) / 10;
-    document.getElementById('statMaxEnergy').innerText = state.maxEnergy;
-    
-    // Подробная статистика
-    document.getElementById('detailedStats').innerHTML = `
-      <div>Всего заработано: ${Math.floor(state.totalCoins || state.coins).toLocaleString()}</div>
-      <div>Уровень энергии: ${Math.floor(state.energy)}/${state.maxEnergy}</div>
-      <div>Регенерация: ${(getRegenRate() * 100).toFixed(1)}%/сек</div>
+    html += `
+      <div class="card upgrade-item">
+        <div class="upgrade-emoji">${up.emoji || '❔'}</div>
+        <div style="flex:1;">
+          <div style="font-weight:bold;font-size:1.2rem;">${up.name} (${level})</div>
+          <div style="color:#555;font-size:0.9rem;">Цена: ${price.toLocaleString()}</div>
+        </div>
+        <button class="buy-btn ${canBuy?'':'disabled'}" 
+                data-id="${up.id}" 
+                data-price="${price}"
+                ${canBuy?'':'disabled'}>
+          Купить
+        </button>
+        <button class="hide-btn" data-id="${up.id}">🙈</button>
+      </div>
     `;
-  }
+  });
+  container.innerHTML = html;
 
-  function getRegenRate() {
-    return 0.01 + (state.upgrades.coffee * 0.02);
-  }
-
-  function createParticle(x, y, value) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.textContent = '+' + Math.floor(value);
-    p.style.left = x + 'px';
-    p.style.top = y + 'px';
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1000);
-  }
-
-  // Клик
-  function handleClick(e) {
-    e.preventDefault?.();
-
-    if (state.energy < state.energyPerTap) {
-      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+  // Делегирование событий (самый надёжный способ)
+  container.addEventListener('click', e => {
+    const btn = e.target.closest('.buy-btn');
+    if (btn && !btn.disabled) {
+      const id = btn.dataset.id;
+      const price = Number(btn.dataset.price);
+      if (state.coins >= price) {
+        state.coins -= price;
+        state.upgrades[id] = (state.upgrades[id] || 0) + 1;
+        applyUpgrades();
+        saveState();
+        renderAll();
+      }
       return;
     }
 
-    state.energy -= state.energyPerTap;
-    
-    const income = calculateIncome();
-    let earned = income.tapBonus;
-    
-    state.coins += earned;
-    state.totalCoins = (state.totalCoins || 0) + earned;
-    state.tapsCount++;
-    state.totalTaps = (state.totalTaps || 0) + 1;
-
-    let clientX, clientY;
-    if (e.touches) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-    createParticle(clientX, clientY, earned);
-
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-
-    checkAchievements();
-    updateRank();
-    render();
-    saveState();
-    renderLeaderboard();
-  }
-
-  // Игровой цикл
-  function gameLoop() {
-    const now = Date.now();
-    const dt = Math.min(2, (now - state.lastEnergyTime) / 1000);
-    if (dt < 0.05) return;
-
-    // Пассив с апгрейдами
-    const income = calculateIncome();
-    state.coins += income.passiveBonus * dt;
-    state.totalCoins = (state.totalCoins || 0) + income.passiveBonus * dt;
-
-    // Регенерация энергии
-    const regenRate = getRegenRate();
-    const regen = state.maxEnergy * regenRate * dt;
-    state.energy = Math.min(state.maxEnergy, state.energy + regen);
-
-    state.lastEnergyTime = now;
-
-    checkAchievements();
-    updateRank();
-    render();
-    saveState();
-  }
-
-  // ================== ОТОБРАЖЕНИЕ УЛУЧШЕНИЙ ==================
-  function renderUpgrades() {
-    const container = document.getElementById('upgradesList');
-    const showHidden = document.getElementById('toggleHiddenBtn').innerText.includes('Скрыть');
-    
-    let html = '';
-    upgradesList.forEach(up => {
-      const level = state.upgrades[up.id] || 0;
-      if (level >= up.maxLevel) return; // макс уровень
-      
-      // Проверка скрыто ли
-      if (state.hiddenUpgrades.includes(up.id) && showHidden) return;
-      
-      const price = Math.floor(up.basePrice * Math.pow(1.5, level));
-      const canAfford = state.coins >= price;
-      
-      html += `
-        <div class="card upgrade-item" id="upgrade-${up.id}">
-          <div class="upgrade-emoji">${up.emoji}</div>
-          <div class="upgrade-info">
-            <div class="upgrade-name">${up.name} (ур. ${level}/${up.maxLevel})</div>
-            <div class="upgrade-desc">${up.desc}</div>
-            <div style="color: #4a6b2f;">📊 ${up.income}</div>
-            <div class="upgrade-price">📚 ${price}</div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 5px;">
-            <button class="buy-btn ${!canAfford ? 'disabled' : ''}" data-upgrade="${up.id}" data-price="${price}" ${!canAfford ? 'disabled' : ''}>Купить</button>
-            <button class="hide-btn" data-hide="${up.id}">🙈</button>
-          </div>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
-
-    // Обработчики покупки
-    document.querySelectorAll('.buy-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        if (btn.disabled) return;
-        
-        const upgradeId = btn.dataset.upgrade;
-        const price = parseInt(btn.dataset.price);
-        
-        if (state.coins >= price) {
-          state.coins -= price;
-          state.upgrades[upgradeId] = (state.upgrades[upgradeId] || 0) + 1;
-          
-          const up = upgradesList.find(u => u.id === upgradeId);
-          if (up.effect) up.effect(state.upgrades[upgradeId]);
-          
-          // Анимация
-          document.getElementById(`upgrade-${upgradeId}`).classList.add('bonus-animation');
-          setTimeout(() => {
-            document.getElementById(`upgrade-${upgradeId}`)?.classList.remove('bonus-animation');
-          }, 500);
-          
-          saveState();
-          render();
-          renderUpgrades();
-          renderLeaderboard();
-        }
-        e.stopPropagation();
-      });
-    });
-
-    // Обработчики скрытия
-    document.querySelectorAll('.hide-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const hideId = btn.dataset.hide;
-        if (!state.hiddenUpgrades.includes(hideId)) {
-          state.hiddenUpgrades.push(hideId);
-          renderUpgrades();
-        }
-        e.stopPropagation();
-      });
-    });
-  }
-
-  // ================== ТОП-15 ==================
-  function renderLeaderboard() {
-    const container = document.getElementById('leaderboardTab');
-    
-    if (allPlayers.length === 0) {
-      container.innerHTML = '<div class="card" style="text-align: center; padding: 30px;">Пока нет активных учеников. Кликни по Вере Николаевне!</div>';
-      return;
-    }
-
-    let html = '<div class="card"><h3>🏆 Лучшие ученики</h3>';
-    allPlayers.forEach((player, idx) => {
-      let rankEmoji = idx + 1;
-      if (idx === 0) rankEmoji = '🥇';
-      else if (idx === 1) rankEmoji = '🥈';
-      else if (idx === 2) rankEmoji = '🥉';
-      
-      html += `
-        <div class="leaderboard-item">
-          <div class="rank">${rankEmoji}</div>
-          <div class="leader-avatar">${typeof player.avatar === 'string' && player.avatar.length === 1 ? player.avatar : '👤'}</div>
-          <div class="leader-name">${player.name}</div>
-          <div>
-            <span class="leader-score">${player.totalCoins.toLocaleString()}</span>
-            <span class="leader-total">всего</span>
-          </div>
-        </div>
-      `;
-    });
-    html += '</div>';
-    container.innerHTML = html;
-  }
-
-  // ================== ДОСТИЖЕНИЯ ==================
-  function renderAchievements() {
-    const container = document.getElementById('achievementsList');
-    let html = '';
-    
-    achievementsList.forEach(ach => {
-      const completed = state.achievements[ach.id];
-      let progress = 0;
-      if (ach.id.includes('tap')) progress = state.totalTaps || state.tapsCount;
-      else progress = state.totalCoins || state.coins;
-      
-      html += `
-        <div class="card" style="opacity: ${completed ? 0.7 : 1}">
-          <div style="display: flex; justify-content: space-between;">
-            <div>
-              <div class="upgrade-name">${ach.name} ${completed ? '✅' : ''}</div>
-              <div>${ach.desc}</div>
-              <div>Прогресс: ${Math.min(progress, ach.target)}/${ach.target}</div>
-            </div>
-            <div style="color: #b6562e;">+${ach.reward}</div>
-          </div>
-        </div>
-      `;
-    });
-    
-    container.innerHTML = html;
-  }
-
-  // ================== ЕЖЕДНЕВКА ==================
-  function renderDaily() {
-    const container = document.getElementById('dailyRewards');
-    let html = '';
-    
-    const rewards = [100, 250, 500, 1000, 2500, 5000, 10000];
-    const today = new Date().setHours(0,0,0,0);
-    
-    rewards.forEach((reward, idx) => {
-      const day = idx + 1;
-      const isActive = state.lastDaily < today && state.dailyStreak === idx;
-      const isClaimed = state.lastDaily === today && state.dailyStreak > idx;
-      
-      html += `
-        <div class="daily-card ${isActive ? 'active' : ''} ${isClaimed ? 'claimed' : ''}">
-          <div>День ${day}</div>
-          <div>+${reward}</div>
-        </div>
-      `;
-    });
-    
-    container.innerHTML = html;
-    
-    // Бонус времени
-    const now = Date.now();
-    const timeBonusCooldown = 4 * 60 * 60 * 1000; // 4 часа
-    const timeBonusAvailable = now - state.lastTimeBonus > timeBonusCooldown;
-    
-    document.getElementById('claimTimeBonusBtn').disabled = !timeBonusAvailable;
-    
-    if (!timeBonusAvailable) {
-      const nextBonus = new Date(state.lastTimeBonus + timeBonusCooldown);
-      const diff = nextBonus - now;
-      const hours = Math.floor(diff / (60 * 60 * 1000));
-      const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
-      document.getElementById('timeBonusTimer').innerText = `${hours}:${minutes.toString().padStart(2, '0')}`;
-    } else {
-      document.getElementById('timeBonusTimer').innerText = 'Доступно!';
-    }
-  }
-
-  // ================== ВКЛАДКИ ==================
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      
-      const tabName = tab.dataset.tab;
-      const tabs = {
-        upgrades: 'upgradesTab',
-        daily: 'dailyTab',
-        stats: 'statsTab',
-        leaderboard: 'leaderboardTab',
-        achievements: 'achievementsTab'
-      };
-      
-      Object.values(tabs).forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-      });
-      
-      document.getElementById(tabs[tabName]).classList.remove('hidden');
-      
-      if (tabName === 'upgrades') renderUpgrades();
-      if (tabName === 'leaderboard') renderLeaderboard();
-      if (tabName === 'achievements') renderAchievements();
-      if (tabName === 'daily') renderDaily();
-    });
-  });
-
-  document.getElementById('toggleHiddenBtn').addEventListener('click', (e) => {
-    const btn = e.target;
-    if (btn.innerText.includes('Скрыть')) {
-      btn.innerText = '🔍 Показать все';
-    } else {
-      btn.innerText = '🔍 Скрыть купленное';
-    }
-    renderUpgrades();
-  });
-
-  document.getElementById('claimDailyBtn').addEventListener('click', () => {
-    const today = new Date().setHours(0,0,0,0);
-    if (state.lastDaily < today) {
-      const reward = [100, 250, 500, 1000, 2500, 5000, 10000][state.dailyStreak] || 100;
-      state.coins += reward;
-      state.totalCoins = (state.totalCoins || 0) + reward;
-      state.dailyStreak = (state.dailyStreak + 1) % 7;
-      state.lastDaily = today;
-      
-      showNotification(`🎁 +${reward} тетрадей!`);
-      renderDaily();
-      render();
-      saveState();
+    const hideBtn = e.target.closest('.hide-btn');
+    if (hideBtn) {
+      const id = hideBtn.dataset.id;
+      if (!state.hiddenUpgrades.includes(id)) {
+        state.hiddenUpgrades.push(id);
+        saveState();
+        renderUpgrades();
+      }
     }
   });
+}
 
-  document.getElementById('claimTimeBonusBtn').addEventListener('click', () => {
-    const now = Date.now();
-    const timeBonusCooldown = 4 * 60 * 60 * 1000;
-    
-    if (now - state.lastTimeBonus > timeBonusCooldown) {
-      const bonus = Math.floor(state.maxEnergy * 0.5); // 50% энергии
-      state.energy = Math.min(state.maxEnergy, state.energy + bonus);
-      state.lastTimeBonus = now;
-      
-      showNotification(`⚡ +${bonus} энергии!`);
-      renderDaily();
-      render();
-      saveState();
-    }
-  });
+function renderLeaderboard() {
+  const container = document.getElementById('leaderboardList');
+  if (!container) return;
 
-  function showNotification(msg) {
-    // Простая реализация
-    alert(msg);
+  if (leaderboard.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;">Пока пусто. Сделай первые клики!</div>';
+    return;
   }
 
-  // Инициализация
-  const clickArea = document.getElementById('clickArea');
-  clickArea.addEventListener('mousedown', handleClick);
-  clickArea.addEventListener('touchstart', handleClick, { passive: false });
-  clickArea.addEventListener('contextmenu', (e) => e.preventDefault());
+  let html = '';
+  leaderboard.slice(0,15).forEach((p, i) => {
+    html += `
+      <div class="card" style="display:flex;align-items:center;gap:12px;padding:12px;">
+        <div style="font-size:1.6rem;font-weight:bold;width:40px;color:#ffb300;">${i+1}</div>
+        <div style="flex:1;">
+          <div>${p.name}</div>
+          <div style="font-size:0.9rem;color:#666;">${p.taps || 0} кликов</div>
+        </div>
+        <div style="font-weight:bold;color:#ffca28;">${p.totalCoins.toLocaleString()}</div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
 
-  loadState();
-  loadAllPlayers();
-  setInterval(gameLoop, 200);
+// ─── Клик ────────────────────────────────────────────
+function handleClick(e) {
+  e.preventDefault();
+  if (state.energy < state.energyPerTap) return;
+
+  state.energy -= state.energyPerTap;
+  const earned = state.tapValue;
+  state.coins += earned;
+  state.totalCoins += earned;
+  state.tapsCount++;
+  state.totalTaps = (state.totalTaps || 0) + 1;
+
+  // частица
+  const rect = document.getElementById('clickArea').getBoundingClientRect();
+  const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+  const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.textContent = `+${Math.floor(earned)}`;
+  p.style.left = x + 'px';
+  p.style.top = y + 'px';
+  document.getElementById('clickArea').appendChild(p);
+  setTimeout(() => p.remove(), 1400);
+
+  saveState();
+  renderAll();
+}
+
+// ─── Игровой цикл ────────────────────────────────────
+function gameLoop() {
+  const now = Date.now();
+  const dt = (now - state.lastEnergyTime) / 1000;
+  state.lastEnergyTime = now;
+
+  // пассив
+  if (state.passivePerSec > 0) {
+    const gain = state.passivePerSec * dt;
+    state.coins += gain;
+    state.totalCoins += gain;
+  }
+
+  // реген энергии
+  const regen = state.maxEnergy * 0.01 * dt * (1 + (state.upgrades.coffee||0)*0.2);
+  state.energy = Math.min(state.maxEnergy, state.energy + regen);
+
+  saveState(); // сохраняем каждые ~сек
+  renderAll();
+}
+
+// ─── Вкладки ─────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    const target = tab.dataset.tab + 'Tab';
+    document.querySelectorAll('#tabContent > div').forEach(div => {
+      div.style.display = div.id === target ? 'block' : 'none';
+    });
+
+    if (target === 'leaderboardTab') renderLeaderboard();
+  });
+});
+
+document.getElementById('toggleHiddenBtn').addEventListener('click', e => {
+  e.target.textContent = e.target.textContent.includes('Скрыть') ? 'Показать все' : 'Скрыть купленное';
+  renderUpgrades();
+});
+
+// Запуск
+document.getElementById('clickArea').addEventListener('touchstart', handleClick, {passive:false});
+document.getElementById('clickArea').addEventListener('mousedown', handleClick);
+
+loadState();
+loadLeaderboard();
+setInterval(gameLoop, 200);
+gameLoop(); // первый тик сразу
 </script>
 </body>
 </html>
