@@ -3,493 +3,245 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Вера Николаевна · Империя</title>
+  <title>Симулятор Веры Николаевны</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
   <style>
     :root {
-      --bg: #0f180f;
-      --card: rgba(20, 35, 20, 0.9);
-      --accent: #ffeb3b;
-      --neon: #00ffaa;
-      --green: #2ecc71;
-      --dark-green: #27ae60;
-      --text: #f0fff0;
+      --bg: #0f001a;
+      --accent: #ff2e63;
+      --accent-dark: #c81e45;
+      --text: #f0e6ff;
+      --card: #1a1033;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: system-ui, sans-serif;
-      background: var(--bg);
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0f001a, #1a0033);
       color: var(--text);
       height: 100vh;
       overflow: hidden;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
-
     #root {
       height: 100%;
       display: flex;
       flex-direction: column;
     }
-
-    .header {
-      background: rgba(10, 20, 10, 0.95);
-      padding: 10px 16px;
-      border-bottom: 2px solid rgba(255,235,59,0.3);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      z-index: 20;
-    }
-
-    .tg-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: var(--green);
-      border: 3px solid var(--accent);
-      overflow: hidden;
-    }
-
-    .tg-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-    .user-name {
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: var(--accent);
-    }
-
-    .score-panel {
-      margin: 10px 16px 6px;
+    header {
       padding: 12px 16px;
-      background: var(--card);
-      border-radius: 16px;
-      border: 1px solid rgba(255,235,59,0.25);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 1.05rem;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(6px);
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      border-bottom: 1px solid #333;
     }
-
-    .score-value {
-      font-size: 2.4rem;
+    .score {
+      font-size: 2.8rem;
       font-weight: 900;
+      margin: 8px 0;
       color: var(--accent);
-      font-family: monospace;
+      text-shadow: 0 0 20px rgba(255,46,99,0.7);
     }
-
-    .energy-container {
-      padding: 0 16px 8px;
-    }
-
-    .energy-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.95rem;
-      margin-bottom: 4px;
+    .level {
+      font-size: 1.1rem;
       opacity: 0.9;
     }
-
-    .energy-bar-bg {
-      height: 18px;
-      background: #0a140a;
-      border-radius: 30px;
-      border: 2px solid #1e3a1e;
+    .energy-bar {
+      height: 14px;
+      background: #222;
+      border-radius: 7px;
+      margin: 10px 16px;
       overflow: hidden;
+      border: 1px solid #444;
     }
-
     .energy-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--neon), #00c853);
-      transition: width 0.4s ease;
+      width: 100%;
+      background: linear-gradient(90deg, #ff2e63, #ff6b9d);
+      transition: width 0.4s ease-out;
     }
-
-    .click-area {
+    #vera {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      padding: 10px;
-      min-height: 320px;
+      font-size: 180px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: transform 0.08s;
     }
-
-    .user-photo {
-      width: 240px;
-      height: 320px;
-      border-radius: 16px;
-      border: 6px solid rgba(255,235,59,0.5);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-      object-fit: cover;
-      transition: transform 0.12s;
+    #vera:active {
+      transform: scale(0.92);
     }
-
-    .user-photo:active {
-      transform: scale(0.94);
-    }
-
     .particle {
       position: absolute;
-      font-size: 2rem;
+      font-size: 28px;
       font-weight: bold;
       color: var(--accent);
-      text-shadow: 0 0 12px var(--accent);
       pointer-events: none;
-      animation: floatUp 1s forwards;
+      text-shadow: 0 0 10px currentColor;
+      animation: floatUp 1.2s forwards;
+      opacity: 0.9;
     }
-
     @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-140px) scale(0.7); }
+      0%   { transform: translateY(0) scale(0.6); opacity: 0.9; }
+      30%  { transform: translateY(-40px) scale(1.1); }
+      100% { transform: translateY(-140px) scale(0.4); opacity: 0; }
     }
-
-    .bottom-tabs {
-      background: rgba(10, 20, 10, 0.98);
-      border-top: 2px solid rgba(0,255,170,0.35);
-      padding: 8px 10px;
-      display: flex;
-      gap: 6px;
-      z-index: 15;
-    }
-
-    .tab {
-      flex: 1;
-      padding: 12px 0;
-      text-align: center;
-      background: rgba(25, 45, 25, 0.7);
-      color: #c8e6c9;
-      font-weight: 600;
-      border-radius: 12px;
-      transition: all 0.2s;
-    }
-
-    .tab.active {
-      background: rgba(0,200,83,0.3);
-      color: white;
-      font-weight: bold;
-    }
-
-    .tab-content {
-      background: var(--card);
-      flex: 1;
-      overflow-y: auto;
+    .bottom-bar {
       padding: 12px 16px;
-      border-top: 1px solid rgba(255,235,59,0.15);
-    }
-
-    .card {
-      background: rgba(30, 50, 30, 0.8);
-      border: 1px solid rgba(255,235,59,0.2);
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-
-    .upgrade-item {
+      background: rgba(20,10,40,0.7);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid #333;
       display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 10px;
+      justify-content: space-around;
+      font-size: 0.9rem;
     }
-
-    .upgrade-emoji {
-      font-size: 42px;
-      width: 70px;
-      height: 70px;
-      background: #1e3a1e;
-      border-radius: 16px;
-      border: 2px solid var(--neon);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .stat {
+      text-align: center;
     }
-
-    .buy-btn {
-      background: linear-gradient(145deg, var(--green), var(--dark-green));
-      border: none;
-      color: white;
-      font-weight: bold;
-      padding: 10px 24px;
-      border-radius: 999px;
-      font-size: 1rem;
-      box-shadow: 0 4px 0 var(--dark-green);
-      cursor: pointer;
-      min-width: 100px;
+    .stat b {
+      display: block;
+      color: var(--accent);
+      font-size: 1.2rem;
     }
-
-    .buy-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 var(--dark-green);
+    @media (min-height: 800px) {
+      #vera { font-size: 240px; }
     }
-
-    .buy-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .promo-input {
-      width: 100%;
-      padding: 12px;
-      background: rgba(10,20,10,0.8);
-      border: 1px solid rgba(255,235,59,0.3);
-      border-radius: 12px;
-      color: white;
-      font-size: 1.1rem;
-      margin: 10px 0;
+    @media (min-height: 1000px) {
+      #vera { font-size: 300px; }
     }
   </style>
 </head>
 <body>
 <div id="root">
-
-  <div class="header">
-    <div class="tg-avatar" id="avatarContainer"><span>👤</span></div>
-    <div class="user-name" id="tgName">Загрузка...</div>
-  </div>
-
-  <div class="score-panel">
-    <span>Тетради</span>
-    <span id="coins" class="score-value">0</span>
-  </div>
-
-  <div class="energy-container">
-    <div class="energy-header">
-      <span>Энергия</span>
-      <span id="energyText">500 / 500</span>
-    </div>
-    <div class="energy-bar-bg">
+  <header>
+    <div class="level">Уровень <span id="lvl">1</span> • Вера Николаевна</div>
+    <div class="score" id="coins">0</div>
+    <div class="energy-bar">
       <div class="energy-fill" id="energyFill" style="width:100%"></div>
     </div>
-  </div>
+  </header>
 
-  <!-- Фото по центру экрана -->
-  <div class="click-area" id="clickArea">
-    <img id="userPhoto" class="user-photo" 
-         src="https://files.oaiusercontent.com/file-0a0XjK4zL0XjK4zL0XjK4zL0?se=2026-03-13T00%3A00%3A00Z&sp=r&sv=2024-08-04&sr=b&rscca=1&sig=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-         alt="Вера Николаевна">
-  </div>
+  <div id="vera">🧮</div>
 
-  <!-- Контент вкладок -->
-  <div class="tab-content" id="tabContent">
-    <div id="upgradesTab">
-      <div id="upgradesList"></div>
-    </div>
-    <div id="promoTab" style="display:none;">
-      <div class="card">
-        <h3 style="color:var(--accent); margin-bottom:12px;">Промокод от t4t1kk</h3>
-        <input type="text" id="promoCodeInput" class="promo-input" placeholder="Введи код">
-        <button id="activatePromoBtn" class="buy-btn" style="width:100%;">Активировать</button>
-        <div id="promoMessage" style="margin-top:12px; min-height:24px;"></div>
-      </div>
-    </div>
-    <div id="statsTab" style="display:none;" class="card">Статистика (пока пусто)</div>
+  <div class="bottom-bar">
+    <div class="stat">Энергия<br><b id="energyText">1000/1000</b></div>
+    <div class="stat">в сек<br><b id="passive">0.0</b></div>
+    <div class="stat">Тапы<br><b id="taps">0</b></div>
   </div>
-
-  <!-- Нижняя панель вкладок -->
-  <div class="bottom-tabs">
-    <div class="tab active" data-tab="upgrades">Улучшения</div>
-    <div class="tab" data-tab="promo">Промо</div>
-    <div class="tab" data-tab="stats">Статистика</div>
-  </div>
-
 </div>
 
 <script>
 const tg = window.Telegram.WebApp;
-tg.ready(); tg.expand();
+tg.ready();
+tg.expand();
 
-let user = tg.initDataUnsafe?.user || {};
-document.getElementById('tgName').textContent = user.first_name || 'Ученик';
-
-// Состояние
 let state = {
   coins: 0,
-  energy: 500,
-  maxEnergy: 500,
-  tapValue: 1,
+  level: 1,
+  energy: 1000,
+  maxEnergy: 1000,
   passivePerSec: 0,
-  energyPerTap: 2,
+  tapsCount: 0,
   lastEnergyTime: Date.now(),
-  upgrades: {},
-  usedPromos: []
+  tapValue: 1,
+  energyPerTap: 1,
+  upgradesBought: {}
 };
 
-const STORAGE_KEY = 'vera_' + (user.id || 'local');
+// Заглушка синхронизации (в продакшене — отправлять на сервер через tg.sendData или fetch)
+function saveState() {
+  // Здесь можно отправить данные на бэкенд
+  // tg.sendData(JSON.stringify(state));
+  localStorage.setItem("vera_state", JSON.stringify(state));
+}
 
 function loadState() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (data) Object.assign(state, JSON.parse(data));
+  const saved = localStorage.getItem("vera_state");
+  if (saved) {
+    Object.assign(state, JSON.parse(saved));
+  }
   render();
 }
 
-function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+function render() {
+  document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
+  document.getElementById("lvl").textContent = state.level;
+  document.getElementById("energyText").textContent = `${Math.floor(state.energy)}/${state.maxEnergy}`;
+  document.getElementById("passive").textContent = state.passivePerSec.toFixed(1);
+  document.getElementById("taps").textContent = state.tapsCount.toLocaleString();
+
+  const pct = (state.energy / state.maxEnergy) * 100;
+  document.getElementById("energyFill").style.width = pct + "%";
 }
 
-// Улучшения (пример)
-const upgrades = [
-  { id: 'pointer', name: 'Указка', emoji: '🪄', basePrice: 50, incTap: 0.5 },
-  { id: 'notebook', name: 'Тетрадь', emoji: '📓', basePrice: 80, incPassive: 0.4 },
-  { id: 'coffee', name: 'Кофе', emoji: '☕', basePrice: 300, incRegen: 0.3 }
-];
+let lastTapTime = 0;
 
-function getPrice(item) {
-  const lvl = state.upgrades[item.id] || 0;
-  return Math.floor(item.basePrice * Math.pow(1.6, lvl));
+function createParticle(x, y) {
+  const p = document.createElement("div");
+  p.className = "particle";
+  p.textContent = "+" + state.tapValue;
+  p.style.left = x + "px";
+  p.style.top = y + "px";
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 1400);
 }
 
-function renderUpgrades() {
-  const container = document.getElementById('upgradesList');
-  let html = '';
+function onTap(e) {
+  const now = Date.now();
+  if (now - lastTapTime < 40) return; // защита от слишком быстрого спама
+  lastTapTime = now;
 
-  upgrades.forEach(item => {
-    const lvl = state.upgrades[item.id] || 0;
-    const price = getPrice(item);
-    const canBuy = state.coins >= price;
-
-    html += `
-      <div class="card upgrade-item">
-        <div class="upgrade-emoji">${item.emoji}</div>
-        <div style="flex:1;">
-          <div style="font-size:1.2rem; font-weight:bold;">${item.name} ${lvl ? `(${lvl})` : ''}</div>
-          <div style="opacity:0.8;">${price} тетрадей</div>
-        </div>
-        <button class="buy-btn ${canBuy ? '' : 'disabled'}" 
-                data-id="${item.id}" 
-                ${canBuy ? '' : 'disabled'}>
-          Купить
-        </button>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-}
-
-// Промокоды
-const promos = {
-  "t4t1kk": { coins: 10000, message: "От t4t1kk +10к!" },
-  "vera":   { coins: 5000,  message: "Вера даёт +5к" }
-};
-
-document.getElementById('activatePromoBtn').addEventListener('click', () => {
-  const code = document.getElementById('promoCodeInput').value.trim().toLowerCase();
-  const msg = document.getElementById('promoMessage');
-
-  if (!code) return msg.textContent = "Введи код";
-  if (state.usedPromos.includes(code)) return msg.textContent = "Уже использован";
-
-  const reward = promos[code];
-  if (reward) {
-    state.coins += reward.coins || 0;
-    state.usedPromos.push(code);
-    saveState();
-    render();
-    msg.textContent = reward.message;
-    msg.style.color = "lime";
-  } else {
-    msg.textContent = "Неверный код";
-    msg.style.color = "red";
-  }
-});
-
-// Клик по фото
-document.getElementById('clickArea').addEventListener('touchstart', e => {
-  e.preventDefault();
   if (state.energy < state.energyPerTap) return;
 
   state.energy -= state.energyPerTap;
-  const earned = state.tapValue;
-  state.coins += earned;
+  state.coins += state.tapValue;
+  state.tapsCount++;
 
-  const touch = e.touches[0];
-  const rect = e.currentTarget.getBoundingClientRect();
-  const p = document.createElement('div');
-  p.className = 'particle';
-  p.textContent = `+${Math.floor(earned)}`;
-  p.style.left = (touch.clientX - rect.left) + 'px';
-  p.style.top = (touch.clientY - rect.top) + 'px';
-  document.getElementById('clickArea').appendChild(p);
-  setTimeout(() => p.remove(), 1200);
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+  const y = e.touches ? e.touches[0].clientY : e.clientY;
+  createParticle(x, y);
 
-  saveState();
   render();
-}, { passive: false });
+  saveState();
+}
 
-// Покупка улучшений
-document.getElementById('upgradesList').addEventListener('click', e => {
-  const btn = e.target.closest('.buy-btn');
-  if (!btn || btn.disabled) return;
-
-  const id = btn.dataset.id;
-  const item = upgrades.find(u => u.id === id);
-  const price = getPrice(item);
-
-  if (state.coins >= price) {
-    state.coins -= price;
-    state.upgrades[id] = (state.upgrades[id] || 0) + 1;
-
-    if (item.incTap)    state.tapValue += item.incTap;
-    if (item.incPassive) state.passivePerSec += item.incPassive;
-    if (item.incRegen)   state.regenBonus = (state.regenBonus || 1) + item.incRegen;
-
-    saveState();
-    render();
-  }
-});
-
-// Вкладки
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-
-    const tabId = tab.dataset.tab + 'Tab';
-    document.querySelectorAll('#tabContent > div').forEach(div => {
-      div.style.display = div.id === tabId ? 'block' : 'none';
-    });
-
-    if (tabId === 'upgradesTab') renderUpgrades();
-  });
-});
-
-// Игровой цикл
+// Пассивный доход + восстановление энергии
 function gameLoop() {
   const now = Date.now();
   const dt = (now - state.lastEnergyTime) / 1000;
   state.lastEnergyTime = now;
 
   // пассив
-  state.coins += (state.passivePerSec || 0) * dt;
+  state.coins += state.passivePerSec * dt;
 
-  // реген энергии
-  const regen = state.maxEnergy * 0.01 * dt * (state.regenBonus || 1);
-  state.energy = Math.min(state.maxEnergy, state.energy + regen);
+  // восстановление энергии
+  const regen = 60; // +60 энергии в минуту → 1 в секунду
+  state.energy = Math.min(state.maxEnergy, state.energy + regen * dt);
 
   render();
 }
 
-function render() {
-  document.getElementById('coins').textContent = Math.floor(state.coins).toLocaleString();
-  document.getElementById('energyText').textContent = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
-  document.getElementById('energyFill').style.width = (state.energy / state.maxEnergy * 100) + '%';
-}
+document.getElementById("vera").addEventListener("pointerdown", onTap);
+document.getElementById("vera").addEventListener("touchstart", onTap);
 
-setInterval(gameLoop, 150);
 loadState();
-renderUpgrades();
-gameLoop();
+setInterval(gameLoop, 800);
+
+// При старте можно запросить данные с сервера (опционально)
+// fetch('/api/load?user=' + tg.initDataUnsafe.user?.id).then(...)
+
+tg.MainButton.setText("Купить улучшения").show();
+tg.MainButton.onClick(() => {
+  alert("Магазин пока в разработке!\n\nСкоро появятся:\n• Доска ➜ +1 за тап\n• Кофе Веры ➜ +энергия\n• Журнал успеваемости ➜ пассив\n• Двойной контрольный ➜ ×2 множитель");
+});
+
 </script>
 </body>
 </html>
