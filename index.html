@@ -3,159 +3,222 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Вера Николаевна • Симулятор</title>
+  <title>Вера Николаевна — Кликер</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    :root {
-      --bg: #0d0017;
-      --card: #180d2b;
-      --accent: #ff3366;
-      --accent-dark: #d41e55;
-      --text: #f5efff;
-      --text-dim: #c4b5e0;
-      --border: #3a2552;
-    }
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: linear-gradient(145deg, #0d0017, #1c0035);
-      color: var(--text);
+      background: #0f1e0f;
+      color: #e8f5e9;
       height: 100vh;
       overflow: hidden;
-      touch-action: manipulation;
-      user-select: none;
     }
     #root {
       height: 100%;
       display: flex;
       flex-direction: column;
+      background: linear-gradient(to bottom, #1b3a1b, #0f1e0f);
     }
-    header {
-      padding: 14px 16px;
-      background: rgba(10, 5, 25, 0.65);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
+
+    /* Шапка */
+    .header {
+      background: #2e5d2e;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 3px solid #4a8c4a;
+    }
+    .tg-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #3a6a3a;
+      border: 3px solid #81c784;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .tg-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .user-info .user-name {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fffde7;
+    }
+
+    /* Основной счёт */
+    .main-score {
+      padding: 16px;
       text-align: center;
     }
-    .level {
+    .score-label {
       font-size: 1rem;
-      color: var(--text-dim);
-      margin-bottom: 4px;
+      color: #a5d6a7;
+      margin-bottom: 6px;
     }
-    .score {
-      font-size: 3.2rem;
-      font-weight: 800;
-      color: var(--accent);
-      text-shadow: 0 0 24px rgba(255,51,102,0.6);
+    .score-value {
+      font-size: 3.8rem;
+      font-weight: 900;
+      color: #fff176;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.6);
       line-height: 1;
     }
+
+    /* Энергия */
+    .energy-block {
+      padding: 0 16px 12px;
+    }
+    .energy-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      color: #c8e6c9;
+      margin-bottom: 6px;
+    }
     .energy-bar {
-      height: 10px;
-      background: #1a0f2e;
-      border-radius: 5px;
-      margin: 12px 8px 8px;
+      height: 24px;
+      background: #1b3a1b;
+      border-radius: 12px;
+      border: 2px solid #4caf50;
       overflow: hidden;
-      border: 1px solid #2e1f45;
     }
     .energy-fill {
       height: 100%;
       width: 100%;
-      background: linear-gradient(90deg, var(--accent), #ff6699);
-      transition: width 0.5s ease-out;
+      background: linear-gradient(90deg, #81c784, #fff176);
+      transition: width 0.4s ease;
     }
-    #vera-area {
+
+    /* Клик-зона */
+    .click-zone {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      font-size: 220px;
-      cursor: pointer;
-      transition: transform 0.1s ease;
+      padding: 20px 0;
     }
-    #vera-area:active {
-      transform: scale(0.94);
+    .teacher-photo {
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      border: 8px solid #81c784;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+      object-fit: cover;
+      transition: transform 0.08s ease;
+      user-select: none;
     }
+    .teacher-photo:active {
+      transform: scale(0.93);
+    }
+
+    /* Частицы */
     .particle {
       position: absolute;
       font-size: 32px;
       font-weight: 800;
-      color: var(--accent);
+      color: #fff176;
+      text-shadow: 0 0 10px #000;
       pointer-events: none;
-      text-shadow: 0 0 14px currentColor;
-      animation: floatUp 1.3s forwards;
+      animation: particleFloat 1.1s forwards;
     }
-    @keyframes floatUp {
-      0%   { transform: translateY(0) scale(0.7); opacity: 0.95; }
-      40%  { transform: translateY(-60px) scale(1.15); }
-      100% { transform: translateY(-180px) scale(0.4); opacity: 0; }
-    }
-    .bottom-bar {
-      padding: 12px 16px;
-      background: rgba(15,8,35,0.75);
-      backdrop-filter: blur(10px);
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.92rem;
-    }
-    .stat {
-      text-align: center;
-      flex: 1;
-    }
-    .stat b {
-      color: var(--accent);
-      font-size: 1.3rem;
-      display: block;
-    }
-    .promo-btn {
-      background: linear-gradient(145deg, #2a1545, #3a1f5c);
-      color: #e0d0ff;
-      border: 1px solid #664a99;
-      border-radius: 12px;
-      padding: 10px 18px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .promo-btn:active {
-      transform: scale(0.96);
-      background: linear-gradient(145deg, #3a1f5c, #2a1545);
+    @keyframes particleFloat {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-160px) scale(1.4); }
     }
 
-    @media (min-height: 780px)  { #vera-area { font-size: 260px; } }
-    @media (min-height: 920px)  { #vera-area { font-size: 300px; } }
-    @media (min-height: 1100px) { #vera-area { font-size: 340px; } }
+    /* Нижняя панель промокодов */
+    .promo-panel {
+      background: #2e5d2e;
+      padding: 16px;
+      border-top: 3px solid #4a8c4a;
+    }
+    .promo-input {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.1rem;
+      border: 2px solid #81c784;
+      border-radius: 12px;
+      background: #1b3a1b;
+      color: white;
+      margin-bottom: 12px;
+    }
+    .promo-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .promo-btn:active {
+      background: #388e3c;
+    }
+    .promo-message {
+      margin-top: 12px;
+      text-align: center;
+      font-weight: bold;
+      min-height: 1.4em;
+    }
+    .success { color: #fff176; }
+    .error   { color: #ef9a9a; }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
+
 <div id="root">
-  <header>
-    <div class="level">Уровень <span id="lvl">1</span> • Вера Николаевна</div>
-    <div class="score" id="coins">0</div>
-    <div class="energy-bar">
-      <div class="energy-fill" id="energyFill" style="width:100%"></div>
-    </div>
-  </header>
 
-  <div id="vera-area">🧮</div>
-
-  <div class="bottom-bar">
-    <div class="stat">
-      Энергия<br>
-      <b id="energyText">1000/1000</b>
+  <div class="header">
+    <div class="tg-avatar" id="avatarContainer">
+      <span>👤</span>
     </div>
-    <div class="stat">
-      в сек<br>
-      <b id="passive">0.0</b>
+    <div class="user-info">
+      <div class="user-name" id="tgName">Загрузка...</div>
     </div>
-    <button class="promo-btn" id="promoButton">Промокод</button>
   </div>
+
+  <div class="main-score">
+    <div class="score-label">Проверено тетрадей</div>
+    <div class="score-value" id="coins">0</div>
+  </div>
+
+  <div class="energy-block">
+    <div class="energy-header">
+      <span>Энергия</span>
+      <span id="energyText">500 / 500</span>
+    </div>
+    <div class="energy-bar">
+      <div class="energy-fill" id="energyFill"></div>
+    </div>
+  </div>
+
+  <div class="click-zone" id="clickArea">
+    <img id="userPhoto" class="teacher-photo"
+         src="https://cdn.discordapp.com/attachments/1467065771107811428/1481643255975248064/image.png"
+         alt="Вера Николаевна">
+  </div>
+
+  <div class="promo-panel">
+    <input type="text" id="promoCode" class="promo-input" placeholder="Введи промокод" autocomplete="off">
+    <button class="promo-btn" id="activatePromo">Активировать</button>
+    <div id="promoMessage" class="promo-message"></div>
+  </div>
+
 </div>
 
 <script>
@@ -163,121 +226,165 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
+// ──────────────────────────────────────────────
+//  Фиксированный ключ — не зависит от user_id
+// ──────────────────────────────────────────────
+const STORAGE_KEY = "vera_nikolaevna_clicker_2026_fixed";
+
+// Только эти промокоды работают (добавляй сюда новые)
+const VALID_PROMOCODES = {
+  "vera2026":       { coins: 15000, energy: 0,   msg: "Стартовый подарок от Веры Николаевны!" },
+  "учителькрутая":  { coins: 5000,  energy: 300, msg: "Спасибо, что кликаешь ❤️" },
+  "проверка2026":   { coins: 25000, energy: 500, msg: "Большая партия тетрадей!" },
+  "secret777":      { coins: 77777, energy: 0,   msg: "Секретный бонус!" },
+  // добавляй сюда новые промокоды по мере необходимости
+};
+
 let state = {
   coins: 0,
-  level: 1,
-  energy: 1000,
-  maxEnergy: 1000,
-  passivePerSec: 0,
+  energy: 500,
+  maxEnergy: 500,
   lastEnergyTime: Date.now(),
   tapValue: 1,
-  energyPerTap: 1,
-  upgradesBought: {}
+  energyPerTap: 2,
+  passivePerSec: 0,
+  usedPromocodes: []          // какие промокоды уже активированы
 };
-
-// Промокоды (только те, что ты раздаёшь лично)
-const PROMOCODES = {
-  "верочка2026":      { coins: 5000,     energy: 0,    message: "Стартовый подарок от Веры!" },
-  "математикаforever": { coins: 15000,    energy: 300,  message: "За любовь к цифрам ✨" },
-  "кофе4вере":        { coins: 0,         energy: 800,  message: "Кофе в учительскую! ☕" },
-  "внсупер":          { coins: 25000,     energy: 0,    message: "Супер-активация!" },
-  // добавляй сюда новые коды по мере необходимости
-};
-
-function saveState() {
-  localStorage.setItem("vera_state", JSON.stringify(state));
-}
 
 function loadState() {
-  const saved = localStorage.getItem("vera_state");
-  if (saved) Object.assign(state, JSON.parse(saved));
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      Object.assign(state, JSON.parse(saved));
+    } catch(e) {}
+  }
   render();
 }
 
-function render() {
-  document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
-  document.getElementById("lvl").textContent = state.level;
-  document.getElementById("energyText").textContent = `${Math.floor(state.energy)}/${state.maxEnergy}`;
-  document.getElementById("passive").textContent = state.passivePerSec.toFixed(1);
-
-  const pct = Math.min(100, (state.energy / state.maxEnergy) * 100);
-  document.getElementById("energyFill").style.width = pct + "%";
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-let lastTapTime = 0;
+function render() {
+  document.getElementById("coins").innerText = Math.floor(state.coins).toLocaleString();
+  document.getElementById("energyText").innerText = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
+  document.getElementById("energyFill").style.width = (state.energy / state.maxEnergy * 100) + "%";
+}
 
+// ──── Частицы ───────────────────────────────────────
 function createParticle(x, y) {
   const p = document.createElement("div");
   p.className = "particle";
-  p.textContent = "+" + state.tapValue;
+  p.textContent = "+" + Math.floor(state.tapValue);
   p.style.left = x + "px";
   p.style.top  = y + "px";
   document.body.appendChild(p);
-  setTimeout(() => p.remove(), 1500);
+  setTimeout(() => p.remove(), 1100);
 }
 
-function onTap(e) {
-  const now = Date.now();
-  if (now - lastTapTime < 35) return;
-  lastTapTime = now;
-
-  if (state.energy < state.energyPerTap) return;
+// ──── Клик ──────────────────────────────────────────
+function handleClick(e) {
+  e.preventDefault();
+  if (state.energy < state.energyPerTap) {
+    tg.HapticFeedback?.notificationOccurred("error");
+    return;
+  }
 
   state.energy -= state.energyPerTap;
   state.coins += state.tapValue;
 
-  const x = e.touches ? e.touches[0].clientX : e.clientX;
-  const y = e.touches ? e.touches[0].clientY : e.clientY;
-  createParticle(x, y);
+  const touch = e.touches?.[0] || e;
+  createParticle(touch.clientX, touch.clientY);
 
+  tg.HapticFeedback?.impactOccurred("light");
   render();
   saveState();
 }
 
+// ──── Восстановление энергии + пассив ───────────────
 function gameLoop() {
   const now = Date.now();
   const dt = (now - state.lastEnergyTime) / 1000;
   state.lastEnergyTime = now;
 
+  // пассив (пока 0, можно потом вернуть улучшения)
   state.coins += state.passivePerSec * dt;
-  const regen = 1; // 1 ед. энергии в секунду
-  state.energy = Math.min(state.maxEnergy, state.energy + regen * dt);
+
+  // реген энергии ~1% в секунду
+  const regen = state.maxEnergy * 0.01 * dt;
+  state.energy = Math.min(state.maxEnergy, state.energy + regen);
 
   render();
+  saveState();
 }
 
-// ─── Промокоды ───────────────────────────────────────
-document.getElementById("promoButton").addEventListener("click", () => {
-  const code = prompt("Введи промокод (только от владельца)").trim().toLowerCase();
-  if (!code) return;
+// ──── Промокоды ─────────────────────────────────────
+document.getElementById("activatePromo").addEventListener("click", () => {
+  const codeInput = document.getElementById("promoCode");
+  const msgEl = document.getElementById("promoMessage");
+  const code = codeInput.value.trim().toLowerCase();
 
-  const reward = PROMOCODES[code];
-  if (reward) {
-    state.coins += reward.coins || 0;
-    state.energy = Math.min(state.maxEnergy, state.energy + (reward.energy || 0));
-
-    alert(`Промокод активирован!\n${reward.message}\n+${reward.coins || 0} монет\n+${reward.energy || 0} энергии`);
-
-    render();
-    saveState();
-  } else {
-    alert("Неверный или просроченный промокод 😔");
+  if (!code) {
+    msgEl.textContent = "Введите промокод";
+    msgEl.className = "promo-message error";
+    return;
   }
+
+  if (state.usedPromocodes.includes(code)) {
+    msgEl.textContent = "Этот промокод уже использован";
+    msgEl.className = "promo-message error";
+    return;
+  }
+
+  const reward = VALID_PROMOCODES[code];
+  if (!reward) {
+    msgEl.textContent = "Промокод не найден 😔";
+    msgEl.className = "promo-message error";
+    return;
+  }
+
+  // выдаём награду
+  state.coins += reward.coins || 0;
+  state.energy = Math.min(state.maxEnergy, state.energy + (reward.energy || 0));
+  state.usedPromocodes.push(code);
+
+  msgEl.textContent = reward.msg || "Промокод активирован!";
+  msgEl.className = "promo-message success";
+
+  codeInput.value = "";
+  render();
+  saveState();
+
+  tg.HapticFeedback?.notificationOccurred("success");
 });
 
-// ─── Инициализация ───────────────────────────────────
-document.getElementById("vera-area").addEventListener("pointerdown", onTap);
-document.getElementById("vera-area").addEventListener("touchstart", onTap, { passive: true });
-
+// ──── Инициализация ─────────────────────────────────
 loadState();
-setInterval(gameLoop, 700);
 
-// Кнопка магазина (пока заглушка)
-tg.MainButton.setText("Магазин улучшений");
-tg.MainButton.show();
-tg.MainButton.onClick(() => {
-  alert("Магазин скоро откроется!\n\nПланируется:\n• Доска и мел → +1–4 за тап\n• Термос с кофе → энергия\n• Классный журнал → пассив\n• Контрольные ×2 / ×3");
-});
+const clickArea = document.getElementById("clickArea");
+clickArea.addEventListener("touchstart", handleClick, { passive: false });
+clickArea.addEventListener("mousedown", handleClick);
+clickArea.addEventListener("contextmenu", e => e.preventDefault());
+
+// Telegram-данные
+try {
+  if (tg.initDataUnsafe?.user) {
+    const u = tg.initDataUnsafe.user;
+    document.getElementById("tgName").innerText = u.first_name + (u.last_name ? " " + u.last_name : "");
+
+    if (u.photo_url) {
+      const img = document.createElement("img");
+      img.src = u.photo_url;
+      document.getElementById("avatarContainer").innerHTML = "";
+      document.getElementById("avatarContainer").appendChild(img);
+    } else {
+      document.getElementById("avatarContainer").innerText = u.first_name?.[0] || "👤";
+    }
+  }
+} catch(e) {}
+
+// Запуск игрового цикла
+setInterval(gameLoop, 400);
 </script>
 </body>
 </html>
