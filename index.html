@@ -3,728 +3,281 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Вера Николаевна — Школьный кликер</title>
+  <title>Вера Николаевна • Симулятор</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    :root {
+      --bg: #0d0017;
+      --card: #180d2b;
+      --accent: #ff3366;
+      --accent-dark: #d41e55;
+      --text: #f5efff;
+      --text-dim: #c4b5e0;
+      --border: #3a2552;
+    }
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
     }
-
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #1a2f1f;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(145deg, #0d0017, #1c0035);
+      color: var(--text);
       height: 100vh;
       overflow: hidden;
       touch-action: manipulation;
+      user-select: none;
     }
-
     #root {
       height: 100%;
       display: flex;
       flex-direction: column;
-      background: linear-gradient(145deg, #2a401f, #1d2e15);
-      position: relative;
     }
-
-    /* Шапка с профилем */
-    .header {
-      background: #4a6b2f;
-      padding: 12px 16px 8px;
-      border-bottom: 4px solid #e6c87c;
-      box-shadow: 0 4px 0 #3d4f24;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    header {
+      padding: 14px 16px;
+      background: rgba(10, 5, 25, 0.65);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
     }
-
-    .tg-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: #7b5e3b;
-      border: 3px solid #f9e0a0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      color: white;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-
-    .tg-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .user-info {
-      flex: 1;
-    }
-
-    .user-name {
-      color: #fef7d6;
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-shadow: 2px 2px 0 #3a5520;
-      margin-bottom: 2px;
-    }
-
-    .user-class {
-      color: #ffd966;
-      font-size: 0.8rem;
-      background: #2e4a1e;
-      display: inline-block;
-      padding: 2px 12px;
-      border-radius: 20px;
-      border: 1px solid #c9a454;
-    }
-
-    /* Счет */
-    .score-panel {
-      background: #345e2e;
-      margin: 12px 16px;
-      padding: 12px;
-      border-radius: 30px;
-      border: 3px solid #ba9f6c;
-      box-shadow: inset 0 -3px 0 #1e3a18, 0 6px 0 #264d1a;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .score-label {
-      color: #f5e2b2;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-    }
-
-    .score-value {
-      font-size: 2.8rem;
-      font-weight: 900;
-      color: #fefae0;
-      text-shadow: 3px 3px 0 #5a3e1f, 5px 5px 0 #2b4b2b;
-      line-height: 1;
-      font-family: 'Courier New', monospace;
-    }
-
-    /* Энергия */
-    .energy-container {
-      padding: 0 16px 10px;
-    }
-
-    .energy-header {
-      display: flex;
-      justify-content: space-between;
-      color: #edd5a8;
+    .level {
+      font-size: 1rem;
+      color: var(--text-dim);
       margin-bottom: 4px;
-      font-size: 0.9rem;
     }
-
-    .energy-bar-bg {
-      height: 20px;
-      background: #3a281c;
-      border-radius: 30px;
-      border: 2px solid #785f34;
+    .score {
+      font-size: 3.2rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-shadow: 0 0 24px rgba(255,51,102,0.6);
+      line-height: 1;
+    }
+    .energy-bar {
+      height: 10px;
+      background: #1a0f2e;
+      border-radius: 5px;
+      margin: 12px 8px 8px;
       overflow: hidden;
+      border: 1px solid #2e1f45;
     }
-
     .energy-fill {
       height: 100%;
       width: 100%;
-      background: linear-gradient(90deg, #f6b83d, #ffdd87);
-      transition: width 0.3s ease;
+      background: linear-gradient(90deg, var(--accent), #ff6699);
+      transition: width 0.5s ease-out;
     }
-
-    /* Фото пользователя по центру */
-    .click-area {
+    #vera-area {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
+      font-size: 220px;
       cursor: pointer;
-      margin: 8px 0;
-    }
-
-    .user-photo {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      border: 6px solid #e6c87c;
-      box-shadow: 0 20px 25px -8px black, 0 0 0 4px #4a6b2f;
-      object-fit: cover;
       transition: transform 0.1s ease;
     }
-
-    .user-photo:active {
-      transform: scale(0.92);
+    #vera-area:active {
+      transform: scale(0.94);
     }
-
-    /* Частицы */
     .particle {
       position: absolute;
-      font-size: 28px;
-      font-weight: bold;
-      color: #ffd966;
-      text-shadow: 2px 2px 0 #7a4d1a;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--accent);
       pointer-events: none;
-      z-index: 100;
-      animation: floatUp 1s forwards;
+      text-shadow: 0 0 14px currentColor;
+      animation: floatUp 1.3s forwards;
     }
-
     @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-      100% { opacity: 0; transform: translateY(-120px) rotate(15deg); }
+      0%   { transform: translateY(0) scale(0.7); opacity: 0.95; }
+      40%  { transform: translateY(-60px) scale(1.15); }
+      100% { transform: translateY(-180px) scale(0.4); opacity: 0; }
     }
-
-    /* Нижняя панель с вкладками */
-    .tabs {
+    .bottom-bar {
+      padding: 12px 16px;
+      background: rgba(15,8,35,0.75);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
       display: flex;
-      background: #4f7535;
-      border-top: 3px solid #e6c87c;
-      padding: 8px 8px 0;
-      gap: 4px;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.92rem;
     }
-
-    .tab {
-      flex: 1;
+    .stat {
       text-align: center;
-      padding: 12px 0;
-      background: #3e6329;
-      color: #efdba8;
-      border-radius: 20px 20px 0 0;
-      font-weight: bold;
-      border: 2px solid #a5874b;
-      border-bottom: none;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .tab.active {
-      background: #fcf0cf;
-      color: #2b4a1a;
-      transform: translateY(-4px);
-    }
-
-    /* Контент вкладок */
-    .tab-content {
-      background: #fcf0cf;
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      border-top: 4px solid #c9a454;
-      box-shadow: inset 0 10px 15px -10px #7b5e3b;
-    }
-
-    /* Карточки магазина */
-    .upgrade-item {
-      background: #fff9e6;
-      border: 3px solid #b68f4c;
-      border-radius: 20px;
-      padding: 15px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      box-shadow: 0 5px 0 #7b5e3b;
-    }
-
-    .upgrade-emoji {
-      font-size: 40px;
-      background: #4a6b2f;
-      width: 70px;
-      height: 70px;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 3px solid #eec27e;
-    }
-
-    .upgrade-info {
       flex: 1;
     }
-
-    .upgrade-name {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #2b4a1a;
-    }
-
-    .upgrade-desc {
-      color: #765e31;
-      font-size: 0.8rem;
-    }
-
-    .upgrade-price {
-      color: #b6562e;
-      font-weight: bold;
+    .stat b {
+      color: var(--accent);
       font-size: 1.3rem;
+      display: block;
     }
-
-    .buy-btn {
-      background: #4f8b3a;
-      border: none;
-      color: white;
-      font-weight: bold;
-      padding: 10px 20px;
-      border-radius: 30px;
-      border-bottom: 4px solid #2a551a;
-      font-size: 1rem;
+    .promo-btn {
+      background: linear-gradient(145deg, #2a1545, #3a1f5c);
+      color: #e0d0ff;
+      border: 1px solid #664a99;
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-weight: 600;
       cursor: pointer;
+      transition: all 0.15s;
+    }
+    .promo-btn:active {
+      transform: scale(0.96);
+      background: linear-gradient(145deg, #3a1f5c, #2a1545);
     }
 
-    .buy-btn:active {
-      transform: translateY(2px);
-      border-bottom-width: 2px;
-    }
-
-    /* Топ-лидеров */
-    .leaderboard-item {
-      display: flex;
-      align-items: center;
-      background: #e9dbbd;
-      margin-bottom: 8px;
-      padding: 8px 15px;
-      border-radius: 40px;
-      border: 2px solid #b68f4c;
-      gap: 10px;
-    }
-
-    .rank {
-      font-size: 1.5rem;
-      font-weight: 900;
-      width: 40px;
-      color: #9e6d3b;
-    }
-
-    .leader-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #7b5e3b;
-      border: 2px solid #e6c87c;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      color: white;
-    }
-
-    .leader-name {
-      flex: 1;
-      font-weight: bold;
-      color: #2d421b;
-    }
-
-    .leader-score {
-      font-weight: 900;
-      color: #b6562e;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* Стиль для income */
-    .income-badge {
-      background: #4a6b2f;
-      color: #fefae0;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      display: inline-block;
-      margin-top: 4px;
-    }
+    @media (min-height: 780px)  { #vera-area { font-size: 260px; } }
+    @media (min-height: 920px)  { #vera-area { font-size: 300px; } }
+    @media (min-height: 1100px) { #vera-area { font-size: 340px; } }
   </style>
 </head>
 <body>
 <div id="root">
-  <!-- Шапка с TG данными -->
-  <div class="header">
-    <div class="tg-avatar" id="avatarContainer">
-      <span id="avatarPlaceholder">👤</span>
-    </div>
-    <div class="user-info">
-      <div class="user-name" id="tgName">Загрузка...</div>
-      <div class="user-class">7 «Б» класс</div>
-    </div>
-  </div>
-
-  <!-- Счет и энергия -->
-  <div class="score-panel">
-    <span class="score-label">📚 Проверено тетрадей</span>
-    <span class="score-value" id="coins">0</span>
-  </div>
-
-  <div class="energy-container">
-    <div class="energy-header">
-      <span>🔋 Энергия Веры</span>
-      <span id="energyText">500/500</span>
-    </div>
-    <div class="energy-bar-bg">
+  <header>
+    <div class="level">Уровень <span id="lvl">1</span> • Вера Николаевна</div>
+    <div class="score" id="coins">0</div>
+    <div class="energy-bar">
       <div class="energy-fill" id="energyFill" style="width:100%"></div>
     </div>
-  </div>
+  </header>
 
-  <!-- Кликабельное фото (Вера Николаевна) -->
-  <div class="click-area" id="clickArea">
-    <img id="userPhoto" class="user-photo" src="https://cdn.discordapp.com/attachments/1467065771107811428/1481643255975248064/image.png?ex=69b40f4f&is=69b2bdcf&hm=f0dc4a03b96184fc8531080dbb0d65e000fe9485a868dd870814dc2c0996786a&" alt="Вера Николаевна">
-  </div>
+  <div id="vera-area">🧮</div>
 
-  <!-- Вкладки -->
-  <div class="tabs">
-    <div class="tab active" data-tab="upgrades">📈 Улучшения</div>
-    <div class="tab" data-tab="leaderboard">🏆 Топ-15</div>
-  </div>
-
-  <!-- Содержимое вкладок -->
-  <div id="tabContent" class="tab-content">
-    <!-- Вкладка улучшений -->
-    <div id="upgradesTab"></div>
-    <!-- Вкладка лидеров -->
-    <div id="leaderboardTab" class="hidden"></div>
+  <div class="bottom-bar">
+    <div class="stat">
+      Энергия<br>
+      <b id="energyText">1000/1000</b>
+    </div>
+    <div class="stat">
+      в сек<br>
+      <b id="passive">0.0</b>
+    </div>
+    <button class="promo-btn" id="promoButton">Промокод</button>
   </div>
 </div>
 
 <script>
-  const tg = window.Telegram.WebApp;
-  tg.ready();
-  tg.expand();
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
 
-  // ================== СОСТОЯНИЕ ==================
-  let state = {
-    coins: 0,
-    energy: 500,
-    maxEnergy: 500,
-    tapsCount: 0,
-    lastEnergyTime: Date.now(),
-    tapValue: 1,
-    energyPerTap: 2,
-    passivePerSec: 0,
-    // Улучшения
-    upgrades: {
-      pointer: 0,   // указка: +1 к тапу
-      notebook: 0,  // тетради: +0.5 пассив
-      desk: 0,      // стол: +20 макс энергии
-      exam: 0       // контрольная: +0.3 пассив
-    }
-  };
+let state = {
+  coins: 0,
+  level: 1,
+  energy: 1000,
+  maxEnergy: 1000,
+  passivePerSec: 0,
+  lastEnergyTime: Date.now(),
+  tapValue: 1,
+  energyPerTap: 1,
+  upgradesBought: {}
+};
 
-  // Данные пользователя из TG
-  let tgUser = {
-    id: 123,
-    first_name: 'Ученик',
-    username: 'schoolboy',
-    photo_url: null
-  };
+// Промокоды (только те, что ты раздаёшь лично)
+const PROMOCODES = {
+  "верочка2026":      { coins: 5000,     energy: 0,    message: "Стартовый подарок от Веры!" },
+  "математикаforever": { coins: 15000,    energy: 300,  message: "За любовь к цифрам ✨" },
+  "кофе4вере":        { coins: 0,         energy: 800,  message: "Кофе в учительскую! ☕" },
+  "внсупер":          { coins: 25000,     energy: 0,    message: "Супер-активация!" },
+  // добавляй сюда новые коды по мере необходимости
+};
 
-  try {
-    if (tg.initDataUnsafe?.user) {
-      tgUser = tg.initDataUnsafe.user;
-      document.getElementById('tgName').innerText = tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : '');
-      if (tgUser.photo_url) {
-        const img = document.createElement('img');
-        img.src = tgUser.photo_url;
-        document.getElementById('avatarContainer').innerHTML = '';
-        document.getElementById('avatarContainer').appendChild(img);
-      } else {
-        document.getElementById('avatarPlaceholder').innerText = tgUser.first_name?.[0] || '👤';
-      }
-    }
-  } catch (e) {}
+function saveState() {
+  localStorage.setItem("vera_state", JSON.stringify(state));
+}
 
-  // ================== РЕАЛЬНЫЙ ТОП-15 ==================
-  let allPlayers = [];
+function loadState() {
+  const saved = localStorage.getItem("vera_state");
+  if (saved) Object.assign(state, JSON.parse(saved));
+  render();
+}
 
-  // Загружаем всех игроков из localStorage
-  function loadAllPlayers() {
-    const saved = localStorage.getItem('school_clicker_all');
-    if (saved) {
-      allPlayers = JSON.parse(saved);
-    } else {
-      // Тестовые данные для примера (потом удалятся)
-      allPlayers = [];
-    }
-  }
+function render() {
+  document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
+  document.getElementById("lvl").textContent = state.level;
+  document.getElementById("energyText").textContent = `${Math.floor(state.energy)}/${state.maxEnergy}`;
+  document.getElementById("passive").textContent = state.passivePerSec.toFixed(1);
 
-  // Сохраняем текущего игрока в общий список
-  function saveCurrentPlayer() {
-    if (state.tapsCount === 0) return; // только если есть активность
+  const pct = Math.min(100, (state.energy / state.maxEnergy) * 100);
+  document.getElementById("energyFill").style.width = pct + "%";
+}
 
-    const existingIndex = allPlayers.findIndex(p => p.id === tgUser.id);
-    const playerData = {
-      id: tgUser.id,
-      name: tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : ''),
-      avatar: tgUser.photo_url || tgUser.first_name?.[0] || '👤',
-      score: Math.floor(state.coins),
-      taps: state.tapsCount
-    };
+let lastTapTime = 0;
 
-    if (existingIndex >= 0) {
-      if (state.coins > allPlayers[existingIndex].score) {
-        allPlayers[existingIndex] = playerData;
-      }
-    } else {
-      allPlayers.push(playerData);
-    }
+function createParticle(x, y) {
+  const p = document.createElement("div");
+  p.className = "particle";
+  p.textContent = "+" + state.tapValue;
+  p.style.left = x + "px";
+  p.style.top  = y + "px";
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 1500);
+}
 
-    // Сортируем по очкам и оставляем топ-15 с >0 проверок
-    allPlayers = allPlayers
-      .filter(p => p.taps > 0) // только те, кто кликал
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 15);
+function onTap(e) {
+  const now = Date.now();
+  if (now - lastTapTime < 35) return;
+  lastTapTime = now;
 
-    localStorage.setItem('school_clicker_all', JSON.stringify(allPlayers));
-  }
+  if (state.energy < state.energyPerTap) return;
 
-  function renderLeaderboard() {
-    const container = document.getElementById('leaderboardTab');
-    
-    if (allPlayers.length === 0) {
-      container.innerHTML = '<div style="text-align: center; padding: 30px; color: #765e31;">Пока нет активных учеников. Кликни по фото Веры Николаевны!</div>';
-      return;
-    }
+  state.energy -= state.energyPerTap;
+  state.coins += state.tapValue;
 
-    let html = '';
-    allPlayers.forEach((player, idx) => {
-      let rankEmoji = idx + 1;
-      if (idx === 0) rankEmoji = '🥇';
-      else if (idx === 1) rankEmoji = '🥈';
-      else if (idx === 2) rankEmoji = '🥉';
-      else rankEmoji = idx + 1;
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+  const y = e.touches ? e.touches[0].clientY : e.clientY;
+  createParticle(x, y);
 
-      html += `
-        <div class="leaderboard-item">
-          <div class="rank">${rankEmoji}</div>
-          <div class="leader-avatar">
-            ${player.avatar && player.avatar.length === 1 ? player.avatar : '👤'}
-          </div>
-          <div class="leader-name">${player.name}</div>
-          <div class="leader-score">${player.score.toLocaleString()}</div>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
-  }
+  render();
+  saveState();
+}
 
-  // ================== ФУНКЦИИ ==================
-  function saveState() {
-    localStorage.setItem('school_clicker_' + tgUser.id, JSON.stringify(state));
-    saveCurrentPlayer();
-  }
+function gameLoop() {
+  const now = Date.now();
+  const dt = (now - state.lastEnergyTime) / 1000;
+  state.lastEnergyTime = now;
 
-  function loadState() {
-    const saved = localStorage.getItem('school_clicker_' + tgUser.id);
-    if (saved) {
-      Object.assign(state, JSON.parse(saved));
-    }
-    render();
-    renderUpgrades();
-    loadAllPlayers();
-    renderLeaderboard();
-  }
+  state.coins += state.passivePerSec * dt;
+  const regen = 1; // 1 ед. энергии в секунду
+  state.energy = Math.min(state.maxEnergy, state.energy + regen * dt);
 
-  function render() {
-    document.getElementById('coins').innerText = Math.floor(state.coins).toLocaleString();
-    document.getElementById('energyText').innerText = `${Math.floor(state.energy)}/${state.maxEnergy}`;
-    const pct = (state.energy / state.maxEnergy) * 100;
-    document.getElementById('energyFill').style.width = pct + '%';
-  }
+  render();
+}
 
-  // Частицы
-  function createParticle(x, y) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.textContent = '+' + Math.floor(state.tapValue * (1 + state.upgrades.pointer * 0.3));
-    p.style.left = x + 'px';
-    p.style.top = y + 'px';
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1000);
-  }
+// ─── Промокоды ───────────────────────────────────────
+document.getElementById("promoButton").addEventListener("click", () => {
+  const code = prompt("Введи промокод (только от владельца)").trim().toLowerCase();
+  if (!code) return;
 
-  // Клик
-  function handleClick(e) {
-    e.preventDefault?.();
+  const reward = PROMOCODES[code];
+  if (reward) {
+    state.coins += reward.coins || 0;
+    state.energy = Math.min(state.maxEnergy, state.energy + (reward.energy || 0));
 
-    if (state.energy < state.energyPerTap) {
-      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-      return;
-    }
+    alert(`Промокод активирован!\n${reward.message}\n+${reward.coins || 0} монет\n+${reward.energy || 0} энергии`);
 
-    state.energy -= state.energyPerTap;
-    
-    // Расчет дохода с учетом апгрейдов
-    let earned = state.tapValue;
-    // Указка дает +0.3 за уровень
-    earned = earned * (1 + state.upgrades.pointer * 0.3);
-    
-    state.coins += earned;
-    state.tapsCount++;
-
-    let clientX, clientY;
-    if (e.touches) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-    createParticle(clientX, clientY);
-
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-
-    render();
-    saveState(); // сохранит и обновит топ
-    renderLeaderboard();
-  }
-
-  // Игровой цикл
-  function gameLoop() {
-    const now = Date.now();
-    const dt = Math.min(2, (now - state.lastEnergyTime) / 1000);
-    if (dt < 0.05) return;
-
-    // Пассив с апгрейдами
-    let passive = 0;
-    // Тетради: +0.5 за уровень
-    passive += state.upgrades.notebook * 0.5;
-    // Контрольная: +0.3 за уровень
-    passive += state.upgrades.exam * 0.3;
-    
-    state.coins += passive * dt;
-
-    // Восстановление энергии (1% в секунду)
-    const regen = state.maxEnergy * 0.01 * dt;
-    state.energy = Math.min(state.maxEnergy, state.energy + regen);
-
-    state.lastEnergyTime = now;
     render();
     saveState();
+  } else {
+    alert("Неверный или просроченный промокод 😔");
   }
+});
 
-  // ================== УЛУЧШЕНИЯ ==================
-  const upgradesList = [
-    { 
-      id: 'pointer', 
-      name: 'Указка', 
-      desc: 'Увеличивает доход за тап', 
-      income: '+30% дохода за уровень',
-      emoji: '🪄', 
-      basePrice: 50, 
-      effect: () => {} // эффект уже в клике
-    },
-    { 
-      id: 'notebook', 
-      name: 'Тетради', 
-      desc: 'Приносят пассивный доход', 
-      income: '+0.5/сек за уровень',
-      emoji: '📚', 
-      basePrice: 80, 
-      effect: () => {}
-    },
-    { 
-      id: 'desk', 
-      name: 'Учительский стол', 
-      desc: 'Увеличивает максимум энергии', 
-      income: '+20 энергии за уровень',
-      emoji: '🪑', 
-      basePrice: 120, 
-      effect: () => { 
-        state.maxEnergy += 20; 
-      }
-    },
-    { 
-      id: 'exam', 
-      name: 'Контрольная', 
-      desc: 'Дополнительный пассив', 
-      income: '+0.3/сек за уровень',
-      emoji: '📝', 
-      basePrice: 200, 
-      effect: () => {}
-    }
-  ];
+// ─── Инициализация ───────────────────────────────────
+document.getElementById("vera-area").addEventListener("pointerdown", onTap);
+document.getElementById("vera-area").addEventListener("touchstart", onTap, { passive: true });
 
-  function renderUpgrades() {
-    const container = document.getElementById('upgradesTab');
-    let html = '';
-    upgradesList.forEach(up => {
-      const count = state.upgrades[up.id] || 0;
-      const price = Math.floor(up.basePrice * (1 + count * 0.5));
-      html += `
-        <div class="upgrade-item">
-          <div class="upgrade-emoji">${up.emoji}</div>
-          <div class="upgrade-info">
-            <div class="upgrade-name">${up.name} (ур. ${count})</div>
-            <div class="upgrade-desc">${up.desc}</div>
-            <div class="income-badge">📈 ${up.income}</div>
-            <div class="upgrade-price">📚 ${price}</div>
-          </div>
-          <button class="buy-btn" data-upgrade="${up.id}" data-price="${price}">Купить</button>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
+loadState();
+setInterval(gameLoop, 700);
 
-    document.querySelectorAll('.buy-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const upgradeId = btn.dataset.upgrade;
-        const price = parseInt(btn.dataset.price);
-        if (state.coins >= price) {
-          state.coins -= price;
-          state.upgrades[upgradeId] = (state.upgrades[upgradeId] || 0) + 1;
-
-          const up = upgradesList.find(u => u.id === upgradeId);
-          if (up.effect) up.effect();
-
-          saveState();
-          render();
-          renderUpgrades();
-          renderLeaderboard();
-        } else {
-          alert('❌ Мало тетрадей!');
-        }
-        e.stopPropagation();
-      });
-    });
-  }
-
-  // ================== ВКЛАДКИ ==================
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      const tabName = tab.dataset.tab;
-      if (tabName === 'upgrades') {
-        document.getElementById('upgradesTab').classList.remove('hidden');
-        document.getElementById('leaderboardTab').classList.add('hidden');
-        renderUpgrades();
-      } else {
-        document.getElementById('upgradesTab').classList.add('hidden');
-        document.getElementById('leaderboardTab').classList.remove('hidden');
-        renderLeaderboard();
-      }
-    });
-  });
-
-  // Инициализация
-  const clickArea = document.getElementById('clickArea');
-  clickArea.addEventListener('mousedown', handleClick);
-  clickArea.addEventListener('touchstart', handleClick, { passive: false });
-  clickArea.addEventListener('contextmenu', (e) => e.preventDefault());
-
-  loadState();
-  setInterval(gameLoop, 500);
-
-  // Показать стартовую вкладку
-  document.getElementById('upgradesTab').classList.remove('hidden');
-  document.getElementById('leaderboardTab').classList.add('hidden');
-  renderUpgrades();
+// Кнопка магазина (пока заглушка)
+tg.MainButton.setText("Магазин улучшений");
+tg.MainButton.show();
+tg.MainButton.onClick(() => {
+  alert("Магазин скоро откроется!\n\nПланируется:\n• Доска и мел → +1–4 за тап\n• Термос с кофе → энергия\n• Классный журнал → пассив\n• Контрольные ×2 / ×3");
+});
 </script>
 </body>
 </html>
